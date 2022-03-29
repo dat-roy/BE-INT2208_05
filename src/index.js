@@ -49,7 +49,7 @@ app.post('/', (req, res) => {
         .catch(console.error);
 })
 
-app.get('/logout', (req, res)=>{
+app.get('/logou', (req, res)=>{
     res.clearCookie('session-token');
     res.redirect('/');
 })
