@@ -8,38 +8,22 @@
     <title>Document</title>
 </head>
 <body>
-
     <div id="g_id_onload"
         data-client_id="836271056493-9jkcpgrhn8qur3f65vvchuksj2m4ub1t.apps.googleusercontent.com"
-        data-auto_select="false"
-        data-callback="handleCredentialResponse">
+        data-context="signin"
+        data-ux_mode="redirect"
+        data-login_uri="http://localhost:3000/login"
+        data-auto_prompt="false">
     </div>
+
     <div class="g_id_signin"
-        data-type="standard"
-        data-size="large"
+        data-type="icon"
+        data-shape="square"
         data-theme="outline"
-        data-text="sign_in_with"
-        data-shape="rectangular"
-        data-logo_alignment="left">
+        data-text="$ {button.text}"
+        data-size="large"
+        data-locale="vi">
     </div>
-
-    <script>
-        function handleCredentialResponse(response) {
-            console.log(response.credential);
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', '/');
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                console.log('Signed in as: ' + xhr.responseText);
-                /*if(xhr.responseText == 'success') {
-                    location.assign("/");
-                }*/
-            }
-            xhr.send(JSON.stringify({token : response.credential}));
-        }
-
-    </script>
 
     <div class="g_id_signout">
         <a href="/logout" id="signout_button">Sign out</a>        
