@@ -3,7 +3,8 @@ const app = express();
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const jose = require('jose');
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const AuthRoute = require('../routes/auth');
 
 var bodyParser = require("body-parser");
@@ -12,6 +13,8 @@ const mongoose = require('mongoose');
 
 //mongoose 
 mongoose.connect('mongodb://localhost:27017/mydb');
+
+
 var db = mongoose.connection;
 db.on('error', console.log.bind(console, "connection error"));
 db.once('open', function (callback) {
@@ -42,32 +45,41 @@ app.use(bodyParser.urlencoded({
 app.use('/api', AuthRoute);
 
 app.post('/sign_up', function (req, res) {
-    var name = req.body.name;
-    var email = req.body.email;
-    var pass = req.body.password;
-    var phone = req.body.phone;
-
-    var data = {
-        "name": name,
-        "email": email,
-        "password": pass,
-        "phone": phone
-
+    bcrypt.hash(req.body.password, 10, function(err, hashedPass){
+        if(err){
+            res.json({
+                error: err
+            })
+        }
+        var name = req.body.name;
+        var email = req.body.email;
+        var phone = req.body.phone;
+    
+        var data = {
+            "name": name,
+            "email": email,
+            "password": hashedPass,
+            "phone": phone
+    
+        }
+        db.collection('details').insertOne(data, function (err, collection) {
+            if (err) throw err;
+            console.log("Record inserted Successfully");
+    
+        });
+    
+        return res.sendFile(path.join(__dirname, 'view/signup_success.html'));
     }
-    db.collection('details').insertOne(data, function (err, collection) {
-        if (err) throw err;
-        console.log("Record inserted Successfully");
+    )
+}
+)
 
-    });
-
-    return res.sendFile(path.join(__dirname, 'view/signup_success.html'));
-})
 
 app.get('/', function (req, res) {
     res.set({
         'Access-control-Allow-Origin': '*'
     });
-    return res.sendFile(path.join(__dirname, 'view/login.html'));
+    return res.sendFile(path.join(__dirname, 'view/signup.html'));
 })
 
 

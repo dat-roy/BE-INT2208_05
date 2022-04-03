@@ -17,9 +17,7 @@ const register = (req,res, next) => {
         })
         user.save()
         .then(user => {
-            res.json({
-                message: 'User added successfully'
-            })
+            res.sendFile('../src/view/signup_success.html');
         })
         .catch(error=>
             res.json({
@@ -41,7 +39,7 @@ const login = (req,res, next) =>{
                     })
                 }
                 if(result){
-                    let token = jwt.sign({name: user.name},'verySecretValue',{expiresIn:'1h'})
+                    let token = jwt.sign({name: user.name},'secretValue',{expiresIn:'1h'})
                     res.json({
                         message:'login successfull',
                         token
