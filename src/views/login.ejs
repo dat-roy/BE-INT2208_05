@@ -9,9 +9,9 @@
 </head>
 <body>
     <h1>Đăng nhập</h1>
-    <form action="/auth/login" method="POST">
-        <p class="username">Tên đăng nhập</p>
-        <input type="text" name="username" id="username"> 
+    <form action="/user/auth/login" method="POST">
+        <p class="account">Email / SĐT</p>
+        <input type="text" name="account" id="account"> 
         <p class="password">Mật khẩu</p>
         <input type="text" name="password" id="password">
         <br/><br/>
@@ -45,6 +45,11 @@
             google.accounts.id.disableAutoSelect();
         }
     </script>
+
+    <br/>
+    <a href="/user/register">Tạo tài khoản</a>
+    <br/>
+    <a href="/user/forgot-password">Quên mật khẩu</a>
 
 </body>
 </html>
