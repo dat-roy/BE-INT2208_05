@@ -8,11 +8,21 @@
     <title>Document</title>
 </head>
 <body>
+    <h1>Đăng nhập</h1>
+    <form action="/auth/login" method="POST">
+        <p class="username">Tên đăng nhập</p>
+        <input type="text" name="username" id="username"> 
+        <p class="password">Mật khẩu</p>
+        <input type="text" name="password" id="password">
+        <br/><br/>
+        <button type="submit" value="submit">Đăng nhập</button>
+    </form>
+    <br/>
     <div id="g_id_onload"
         data-client_id="836271056493-9jkcpgrhn8qur3f65vvchuksj2m4ub1t.apps.googleusercontent.com"
         data-context="signin"
         data-ux_mode="redirect"
-        data-login_uri="http://localhost:3000/login"
+        data-login_uri="http://localhost:3000/user/auth/google-login"
         data-auto_prompt="false">
     </div>
 
@@ -25,8 +35,9 @@
         data-locale="vi">
     </div>
 
+    <br/>
     <div class="g_id_signout">
-        <a href="/logout" id="signout_button">Sign out</a>        
+        <a href="/user/logout" id="signout_button">Sign out</a>        
     </div>
     <script>
         const button = document.getElementById("signout_button");
