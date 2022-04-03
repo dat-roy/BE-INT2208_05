@@ -1,62 +1,36 @@
-const express = require('express');
-const app = express();
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const jose = require('jose');
-
-
-//Google Auth
-const {OAuth2Client} = require('google-auth-library');
-const { stringify } = require('querystring');
-const CLIENT_ID = '836271056493-9jkcpgrhn8qur3f65vvchuksj2m4ub1t.apps.googleusercontent.com';
-const client = new OAuth2Client(CLIENT_ID);
-
+//Define hostname & port
 const hostname = '127.0.0.1';
 const PORT = 3000;
 
-//Middleware
-app.use(express.json());
-app.use(cookieParser());
-app.use(express.static('public'));          //Serving static files in express
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const path = require('path');
 
+//Initialize app
+const app = express();
+//Connect to MongoDB
+const db = require('./config/db/index.db');
+db.connect();
 
-app.get('/', (req, res) => {
-   res.sendFile(path.join(__dirname, 'view/index.html'));
-})
+//------ Middleware -----//
+//[express] Serving static files in express
+app.use(express.static(path.join(__dirname, 'public')));  
+//[cookie-parser] Parse cookie header
+app.use(cookieParser());        
+//[body-parser] Parse request object as a JSON object: application/json
+app.use(bodyParser.json()); 
+//[body-parser] Parse urlencoded bodies: application/xwww-
+app.use(bodyParser.urlencoded({ extended: true })); 
+//Set view engine
+app.set('view engine', 'ejs');
+//Set views folder path
+app.set('views', path.join(__dirname, 'views'));
 
-app.post('/', (req, res) => {
+//Routes init
+const initRoutes = require('./routes/index.route.js');
+initRoutes(app);
 
-    token = req.body.token;
-    //console.log(req.body.token);
-
-    let user = {};
-    async function verify() {
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
-        });
-        const payload = ticket.getPayload();
-        console.log(payload);
-        const userid = payload['sub'];
-        // If request specified a G Suite domain:
-        // const domain = payload['hd'];
-      }
-    verify()
-        .then(()=>{
-            res.cookie('session-token', token);
-            res.send('success');
-        })
-        .catch(console.error);
-})
-
-app.get('/logou', (req, res)=>{
-    res.clearCookie('session-token');
-    res.redirect('/');
-})
-
-
-app.listen(PORT, () => {
+app.listen(PORT, hostname, () => {
     console.log(`Running on port ${PORT}`);
 })
-
-//Something strange
