@@ -1,24 +1,7 @@
-const mongoose= require('mongoose');
-const Schema = mongoose.Schema;
-
-const userSchema = new Schema({
-name:{
-     type: String
-},
-email:{
-    type: String
-},
-role:{
-    type: String
-},
-phone:{
-    type: String
-},
-password:{
-    type: String
-}} , {timestamps: true}
-)
-
+const mongoose = require('mongoose');
+const slug = require('mongoose-slug-generator');
+mongoose.plugin(slug);
+const { Schema } = mongoose;
 
 const UserSchema = new Schema(
     {
@@ -38,5 +21,7 @@ const UserSchema = new Schema(
         timestamps: true,
     },
 )
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+
+// Export a model
+// Modal name = Collection name (in plural & lowercase form)
+module.exports = mongoose.model('user', UserSchema)

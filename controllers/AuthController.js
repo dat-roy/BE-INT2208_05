@@ -17,7 +17,7 @@ const register = (req,res, next) => {
         })
         user.save()
         .then(user => {
-            res.sendFile('../src/view/signup_success.html');
+            res.sendFile('../src/views/signup_success.html');
         })
         .catch(error=>
             res.json({

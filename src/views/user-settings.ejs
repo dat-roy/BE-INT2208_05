@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  
+    <a href="">Notifications</a>
+
+    <h1>Hi <%= user.username%></h1>
+    <img src="/upload/avatar/<%= user.picture %>" alt="user-avatar" style="width: 200px; height: auto; border-radius: 30%;">
+    <br><br>
+    
+    <form action="" method="POST" enctype="multipart/form-data">
+        Change avatar: 
+        <input type="file" name="avatar" id="avatar">
+        <br><br>
+        Username: <input type="text" value="<%=user.username%>" name="username">
+        <br><br>
+        First name: <input type="text" name="family_name" value="<%= user.family_name%>">
+        <br><br>
+        Last name: <input type="text" name="given_name" value="<%= user.given_name %>">
+        <br><br>
+        Gender: <input type="text" value="<%=user.gender%>">
+        <br><br>
+        Phone: <input type="tel" name="phone" id="" value="<%=user.phone%>">
+        <br><br>
+        <input type="submit" value="Change">
+    </form>
+    
+</body>
+</html>
+© 2022 GitHub, Inc.
