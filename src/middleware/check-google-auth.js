@@ -1,7 +1,7 @@
 function checkGoogleAuthenticated(req, res, next) {
     //Google Auth
     const { OAuth2Client } = require('google-auth-library');
-    const CLIENT_ID = '836271056493-9jkcpgrhn8qur3f65vvchuksj2m4ub1t.apps.googleusercontent.com';
+    const CLIENT_ID = '823357101372-fcr2i1ngeimfjbtqf775sgp112tijhco.apps.googleusercontent.com';
     const client = new OAuth2Client(CLIENT_ID);
 
     let token = req.cookies['session-token'];
@@ -16,8 +16,8 @@ function checkGoogleAuthenticated(req, res, next) {
         user.email = payload.email;
         user.picture = payload.picture;
     }
-        verify()
-        .then( () => {
+    verify()
+        .then(() => {
             req.user = user;
             next();
         })

@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 
 //Google Auth
 const { OAuth2Client } = require('google-auth-library');
-const CLIENT_ID = '836271056493-9jkcpgrhn8qur3f65vvchuksj2m4ub1t.apps.googleusercontent.com';
+const CLIENT_ID = '823357101372-fcr2i1ngeimfjbtqf775sgp112tijhco.apps.googleusercontent.com';
 const client = new OAuth2Client(CLIENT_ID);
 
 //===========================
@@ -34,10 +34,11 @@ class userController {
             });
             userRecord.save()
                 .then(user => {
+                    console.log(user);
                     res.send("Registered successfully");
                 })
                 .catch(error => res.json({
-                    message: 'An error occured!'
+                    message: 'An error occurred!'
                 }));
         })
     }
@@ -88,13 +89,14 @@ class userController {
                 audience: CLIENT_ID,  
             });
             const payload = ticket.getPayload();
+            console.log(payload);
             //console.log(payload);
             //const userid = payload['sub'];
         }
         verify()
             .then(()=>{
                 res.cookie('session-token', token);
-                res.redirect('/user/profile');
+                res.redirect('/test/profile');
             })
             .catch(console.error);
     }
