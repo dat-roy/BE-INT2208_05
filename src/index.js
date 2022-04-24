@@ -1,11 +1,12 @@
-//Define hostname & port
-const hostname = '127.0.0.1';
-const PORT = 3000;
-
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const path = require('path');
+const initRoutes = require('./routes/index.route.js');
+
+//Define hostname & port
+const hostname = '127.0.0.1';
+const PORT = 3000;
 
 //Initialize app
 const app = express();
@@ -28,7 +29,6 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 //Routes init
-const initRoutes = require('./routes/index.route.js');
 initRoutes(app);
 
 app.listen(PORT, hostname, () => {

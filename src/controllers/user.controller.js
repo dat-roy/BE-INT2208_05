@@ -3,10 +3,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
+const JWTPrivateKey = "TiroAccounts";
 //Google Auth
 const { OAuth2Client } = require('google-auth-library');
-const CLIENT_ID = '836271056493-9jkcpgrhn8qur3f65vvchuksj2m4ub1t.apps.googleusercontent.com';
-const client = new OAuth2Client(CLIENT_ID);
+const CLIENT_ID = '823357101372-fcr2i1ngeimfjbtqf775sgp112tijhco.apps.googleusercontent.com';
 
 //===========================
 class userController {
@@ -21,11 +21,9 @@ class userController {
         const saltRounds = 10;
 
         bcrypt.hash(req.body.password, saltRounds, (err, hashedPwd) => {
-            if (err) {
-                res.json({
-                    error: err
-                });
-            }
+            if (err) res.send(err);
+
+            // Need authenticating???
             let userRecord = new UserModel({
                 username: req.body.name,
                 email: req.body.email,
@@ -33,12 +31,8 @@ class userController {
                 password: hashedPwd,
             });
             userRecord.save()
-                .then(user => {
-                    res.send("Registered successfully");
-                })
-                .catch(error => res.json({
-                    message: 'An error occured!'
-                }));
+                .then(user => res.send("Registered successfully"))
+                .catch(error => res.send('An error occurred!'));
         })
     }
 
@@ -53,48 +47,44 @@ class userController {
         let password = req.body.password;
 
         UserModel.findOne({ $or: [{email: account}, {phone: account}] })
-            .then(user => {
-                if (! user) {
-                    res.json({
-                        message: 'User not found!'
-                    });
-                } 
-                else {
-                    bcrypt.compare(password, user.password)
-                        .then(result => {
-                            if (! result) {
-                                res.json({
-                                    message: 'Password do not match',
-                                });
-                            } 
-                            let token = jwt.sign({name: user.name}, 'secretValue', {expiresIn: '1h'});
-                            res.json({
-                                message: 'Login successful',
-                                token,
-                            })
-                        })
-                        .catch(err => res.json({ error: err }) );
-                }
-            })
-            //.catch( (err) => res.json({ error: err}) );
+        .then(user => {
+            if (! user) res.send("User not found");
+            else {
+                bcrypt.compare(password, user.password)
+                .then( result => {
+                    if (! result) {
+                        res.send('Password does not match');
+                    } else {
+                        //Default algorithm: HMAC SHA256
+                        let token = jwt.sign({ email: user.email }, JWTPrivateKey, {expiresIn: '3h'});
+                        res.cookie('session-token', token);
+                        res.redirect('/test/profile');
+                    }
+                });
+            }
+        })
     }
 
     // [POST] /user/auth/google-login
     verifyGoogleLogin(req, res, next) {
-        let token = req.body.credential;
+        const client = new OAuth2Client(CLIENT_ID);
+
+        let google_token = req.body.credential;
+        let token;
         async function verify() {
             const ticket = await client.verifyIdToken({
-                idToken: token,
+                idToken: google_token,
                 audience: CLIENT_ID,  
             });
             const payload = ticket.getPayload();
-            //console.log(payload);
-            //const userid = payload['sub'];
+
+            //Default algorithm: HMAC SHA256
+            token = jwt.sign({ email: payload.email }, JWTPrivateKey, {expiresIn: '3h'});
         }
         verify()
             .then(()=>{
                 res.cookie('session-token', token);
-                res.redirect('/user/profile');
+                res.redirect('/test/profile');
             })
             .catch(console.error);
     }
@@ -106,17 +96,13 @@ class userController {
 
     // [POST] /user/forgot-password
     forgotPassword(req, res, next) {
-        const JWT_SECRET = 'some super secret';
 
         UserModel.findOne({email: req.body.email})
             .then(user => {
-                
-                const secret = JWT_SECRET + user.password;
                 const payload = {
                     email: user.email,
-                    id: user.id,
                 };
-                let token = jwt.sign(payload, secret, {expiresIn: '15m'});
+                let token = jwt.sign(payload, JWTPrivateKey + user.password, {expiresIn: '15m'});
                 const link = `http://localhost:3000/user/reset-password/${user.id}/${token}`;
                 //console.log(link);
 
@@ -133,7 +119,7 @@ class userController {
                     from: "Tiro Accounts",                  
                     to: `${user.email}`,                         
                     subject: "Bạn Có Thư Tình???",          
-                    text: link,                             // plain text body
+                    text: link,         // plain text body
                 };
 
                 transporter.sendMail(info, (err, data) => {
@@ -152,14 +138,11 @@ class userController {
 
     // [GET] /user/reset-password/:id/:token
     viewResetPassword(req, res, next) {
-        const JWT_SECRET = 'some super secret';
-
         var {token} = req.params;
         UserModel.findOne({id: req.params.id})
             .then(user => {
-                const secret = JWT_SECRET + user.password;
                 try {
-                    const payload = jwt.verify(token, secret);
+                    const payload = jwt.verify(token, JWTPrivateKey + user.password);
                     res.render('reset-password', {email: user.email});
                 } catch (err) {
                     //console.log(err.message);
@@ -170,7 +153,6 @@ class userController {
     
     // [POST] /user/reset-password/:id/:token
     resetPassword(req, res, next) {
-        const JWT_SECRET = 'some super secret';
         UserModel.findOne({id: req.params.id})
             .then( user => {
                 const { password, confirm_password } = req.body;
@@ -180,13 +162,12 @@ class userController {
                     return;
                 }
 
-                const secret = JWT_SECRET + user.password;
+                const secret = JWTPrivateKey + user.password;
                 try {
-                    const payload = jwt.verify(req.params.token, secret)
+                    const payload = jwt.verify(req.params.token, secret);
                     user.password = password;
                     res.send(user);
                 } catch (error) {
-                    console.log(error.message);
                     res.send(error.message);
                 }
             })
