@@ -10,6 +10,7 @@
 | `/test/register`          | GET    | Register page                      |
 | `/test/profile`           | GET    | Get current user profile           |
 | `/test/forgot-password`   | GET    | Forget password page               |
+| `/user/activate-account/:id/:token` | GET | Activate a new account 	  |
 | `/user/register`          | POST   | Register a new user in DB          |
 | `/user/auth/login`        | POST   | Check if given user is valid in DB |
 | `/user/auth/google-login` | POST   | Setup/check GG linked account      |
