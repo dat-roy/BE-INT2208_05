@@ -6,37 +6,117 @@ const nodemailer = require('nodemailer');
 const JWTPrivateKey = "TiroAccounts";
 //Google Auth
 const { OAuth2Client } = require('google-auth-library');
+const userModel = require('../models/user.model.js');
 const CLIENT_ID = '823357101372-fcr2i1ngeimfjbtqf775sgp112tijhco.apps.googleusercontent.com';
 
+//Nodemailer
+//Create reusable transporter object using the default SMTP transport
+const transporter = nodemailer.createTransport({
+    service: "gmail",   
+    auth: {
+        user: "group7.int2208@gmail.com", 
+        pass: "nhom7isthebest",
+    },
+});
 //===========================
 class userController {
 
-    // [GET] /user/register
+    // [GET] /test/register
     register(req, res, next) {
         res.render('register');
     }
-    
+
     // [POST] /user/register
     submitRegister(req, res, next) {
-        const saltRounds = 10;
+        
+        const {username, email, phone, password} = req.body;
 
-        bcrypt.hash(req.body.password, saltRounds, (err, hashedPwd) => {
-            if (err) res.send(err);
+        //Check existing username & email & phone in DB:
+        UserModel.findOne( { $or: [ {username: username}, {email: email}, {phone: phone}] } )
+        .then( user => {
+            if (user) {
+                res.send('Your username / email / phone number is already used');
+                return;
+            }
+            const saltRounds = 10;
+            bcrypt.hash(password, saltRounds, (err, hashedPwd) => {
+                if (err) {
+                    console.log('Bcrypt: ', err);
+                    res.send('Error');
+                    return err;
+                }
+                let userRecord = new UserModel({
+                    username: username,
+                    email: email,
+                    phone: phone,
+                    password: hashedPwd,
+                });
+                userRecord.save()
+                    .then(user => {
+                        console.log("Saved a new user.");
+                        //Email verification:
+                        const payload = {
+                            email: user.email,
+                        };
+                        let token = jwt.sign(payload, JWTPrivateKey + user.password);
+                        const link = `http://localhost:3000/user/activate-account/${user.id}/${token}`;
 
-            // Need authenticating???
-            let userRecord = new UserModel({
-                username: req.body.name,
-                email: req.body.email,
-                phone: req.body.phone,
-                password: hashedPwd,
-            });
-            userRecord.save()
-                .then(user => res.send("Registered successfully"))
-                .catch(error => res.send('An error occurred!'));
+                        let info = {
+                            from: {
+                                name: "Tiro Accounts",
+                                address: "group7.int2208@gmail.com",
+                            },
+                            to: `${user.email}`,                         
+                            subject: "Tiro Account Activation.",          
+                            text: link,         
+                        };
+
+                        transporter.sendMail(info, (err, data) => {
+                            if (err) {
+                                console.log('Sending email error: ', err);
+                                res.send(err);
+                            } else {
+                                console.log('Email sent');
+                                res.render('confirm-register', {user});
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.send(err);
+                    });
+            })
+        
         })
     }
 
-    // [GET] /user/login
+    // [GET] /user/activate-account/:id/:token
+    viewActivateAccount(req, res, next) {
+        let {token} = req.params;
+        UserModel.findOne({_id: req.params.id})
+            .then(user => {
+                try {
+                    const payload = jwt.verify(token, JWTPrivateKey + user.password);
+                    //Update email_verified:
+                    UserModel.findByIdAndUpdate(req.params.id, {email_verified: true})
+                        .then(() => {
+                            res.render('activate', {email: user.email});
+                        })
+                        .catch(() => {
+                            res.render('Error when activating!');
+                        })
+                } catch (err) {
+                    console.log(err.message);
+                    res.send('Invalid or expired token!');
+                }
+            })
+            .catch(() => {
+                res.send('Invalid user id!');
+            })
+    }
+
+
+    // [GET] /test/login
     login(req, res, next) {
         res.render('login');
     }
@@ -48,20 +128,24 @@ class userController {
 
         UserModel.findOne({ $or: [{email: account}, {phone: account}] })
         .then(user => {
-            if (! user) res.send("User not found");
-            else {
-                bcrypt.compare(password, user.password)
-                .then( result => {
-                    if (! result) {
-                        res.send('Password does not match');
-                    } else {
-                        //Default algorithm: HMAC SHA256
-                        let token = jwt.sign({ email: user.email }, JWTPrivateKey, {expiresIn: '3h'});
-                        res.cookie('session-token', token);
-                        res.redirect('/test/profile');
-                    }
-                });
+            if (! user) {
+                res.send("User not found.");
+                return;
             }
+
+            //Check password in DB:
+            bcrypt.compare(password, user.password)
+            .then( result => {
+                if (! result) {
+                    res.send('Wrong password.');
+                } else {
+                    //Default algorithm: HMAC SHA256
+                    let token = jwt.sign({ email: user.email }, JWTPrivateKey, {expiresIn: '3h'});
+                    res.cookie('session-token', token);
+                    res.redirect('/test/profile');
+                }
+            });
+            
         })
     }
 
@@ -89,7 +173,7 @@ class userController {
             .catch(console.error);
     }
 
-    // [GET] /user/forgot-password
+    // [GET] /test/forgot-password
     viewForgotPassword(req, res, next) {
         res.render('forgot-password');
     }
@@ -104,56 +188,53 @@ class userController {
                 };
                 let token = jwt.sign(payload, JWTPrivateKey + user.password, {expiresIn: '15m'});
                 const link = `http://localhost:3000/user/reset-password/${user.id}/${token}`;
-                //console.log(link);
-
-                // create reusable transporter object using the default SMTP transport
-                let transporter = nodemailer.createTransport({
-                    service: "gmail",   
-                    auth: {
-                        user: "group7.int2208@gmail.com", 
-                        pass: "nhom7isthebest",
-                    },
-                });
 
                 let info = {
-                    from: "Tiro Accounts",                  
+                    from: {
+                        name: "Tiro Accounts",
+                        address: "group7.int2208@gmail.com",
+                    },
                     to: `${user.email}`,                         
-                    subject: "Bạn Có Thư Tình???",          
-                    text: link,         // plain text body
+                    subject: "Reset your Tiro password.",          
+                    text: link,         
                 };
 
                 transporter.sendMail(info, (err, data) => {
                     if (err) {
-                        console.log('Error: ', err);
+                        console.log('Error while sending mail: ', err);
+                        res.send(err);
                     } else {
                         console.log('Email sent');
+                        res.send('Password reset link has been sent to your email...');
                     }
                 });
-                res.send('Password reset link has been sent to your email...');
             })
             .catch(err => {
-                //console.log(err);
+                console.log(err);
             });
     }
 
     // [GET] /user/reset-password/:id/:token
     viewResetPassword(req, res, next) {
-        var {token} = req.params;
-        UserModel.findOne({id: req.params.id})
+        let {token} = req.params;
+        UserModel.findOne({_id: req.params.id})
             .then(user => {
                 try {
                     const payload = jwt.verify(token, JWTPrivateKey + user.password);
                     res.render('reset-password', {email: user.email});
                 } catch (err) {
-                    //console.log(err.message);
-                    res.send(err.message);
+                    console.log(err.message);
+                    res.send('Invalid or expired token!');
                 }
+            })
+            .catch(() => {
+                res.send('Invalid user id!');
             })
     }
     
     // [POST] /user/reset-password/:id/:token
     resetPassword(req, res, next) {
-        UserModel.findOne({id: req.params.id})
+        UserModel.findOne({_id: req.params.id})
             .then( user => {
                 const { password, confirm_password } = req.body;
                 if (password !== confirm_password) {
@@ -166,20 +247,25 @@ class userController {
                 try {
                     const payload = jwt.verify(req.params.token, secret);
                     user.password = password;
-                    res.send(user);
-                } catch (error) {
-                    res.send(error.message);
+                    //console.log(user);
+                    res.send('Password updated');
+                } catch (err) {
+                    console.log(err);
+                    res.send('Invalid or expired token!');
                 }
+            })
+            .catch(() => {
+                res.send('Invalid user id!');
             })
     }
 
-    // [GET] /user/profile
+    // [GET] /test/profile
     getProfile(req, res, next) {    
         let user = req.user;
         res.render('profile', {user});
     }
     
-    // [GET]] /user/protected-route
+    // [GET]] /test/protected-route
     getProtectedRoute(req, res, next) {
         res.send('<br><br><br><center><h1>Có thể bạn thừa biết: Lý do bạn còn ế là do nhạt bormej!</h1></center>');
     }

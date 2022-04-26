@@ -5,6 +5,7 @@ var checkSession = require('../middlewares/check-session.js');
 
 //=========================//
 router.post('/register', userController.submitRegister);
+router.get('/activate-account/:id/:token', userController.viewActivateAccount);
 router.post('/auth/login', userController.verifyLogin);
 router.post('/auth/google-login', userController.verifyGoogleLogin);
 router.post('/forgot-password', userController.forgotPassword);

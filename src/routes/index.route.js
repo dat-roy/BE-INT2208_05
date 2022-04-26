@@ -4,8 +4,8 @@ const testRouter = require('./test.route.js');
 
 //======================//
 function initRoutes(app) {
-    app.use('/test', testRouter);
     app.use('/user', userRouter);
+    app.use('/test', testRouter);
     app.use('/', siteRouter);
 }
 
