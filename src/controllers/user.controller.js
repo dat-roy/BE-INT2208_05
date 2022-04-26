@@ -1,16 +1,26 @@
 const UserModel = require('../models/user.model.js');
+const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const multer = require('multer');
+const fs = require('fs');
+const { unlink } = require('fs');
 
+// [Bcrypt]
+const saltRounds = 10;
+
+// [JWT sign]
+// Default algorithm: HMAC SHA256
 const JWTPrivateKey = "TiroAccounts";
-//Google Auth
+
+// Google Auth]
 const { OAuth2Client } = require('google-auth-library');
 const userModel = require('../models/user.model.js');
 const CLIENT_ID = '823357101372-fcr2i1ngeimfjbtqf775sgp112tijhco.apps.googleusercontent.com';
 
-//Nodemailer
-//Create reusable transporter object using the default SMTP transport
+// [Nodemailer]
+// Create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
     service: "gmail",   
     auth: {
@@ -18,10 +28,11 @@ const transporter = nodemailer.createTransport({
         pass: "nhom7isthebest",
     },
 });
+
 //===========================
 class userController {
 
-    // [GET] /test/register
+    // [GET] /user/register
     register(req, res, next) {
         res.render('register');
     }
@@ -38,7 +49,6 @@ class userController {
                 res.send('Your username / email / phone number is already used');
                 return;
             }
-            const saltRounds = 10;
             bcrypt.hash(password, saltRounds, (err, hashedPwd) => {
                 if (err) {
                     console.log('Bcrypt: ', err);
@@ -91,7 +101,7 @@ class userController {
     }
 
     // [GET] /user/activate-account/:id/:token
-    viewActivateAccount(req, res, next) {
+    activateAccount(req, res, next) {
         let {token} = req.params;
         UserModel.findOne({_id: req.params.id})
             .then(user => {
@@ -115,9 +125,9 @@ class userController {
             })
     }
 
-    // [GET] /test/login
+    // [GET] /user/login
     login(req, res, next) {
-        res.render('login');
+        res.render('login', {client_id: CLIENT_ID});
     }
 
     // [POST] /user/auth/login
@@ -136,7 +146,7 @@ class userController {
                     //Default algorithm: HMAC SHA256
                     let token = jwt.sign({ email: user.email }, JWTPrivateKey, {expiresIn: '3h'});
                     res.cookie('session-token', token);
-                    res.redirect('/test/profile');
+                    res.redirect('/user/profile');
                 }
             });
         })
@@ -159,13 +169,12 @@ class userController {
             });
             const payload = ticket.getPayload();
 
-            //Default algorithm: HMAC SHA256
             token = jwt.sign({ email: payload.email }, JWTPrivateKey, {expiresIn: '3h'});
         }
         verify()
             .then(()=>{
                 res.cookie('session-token', token);
-                res.redirect('/test/profile');
+                res.redirect('/user/profile');
             })
             .catch((err) => {
                 console.log(err);
@@ -173,7 +182,7 @@ class userController {
             });
     }
 
-    // [GET] /test/forgot-password
+    // [GET] /user/forgot-password
     viewForgotPassword(req, res, next) {
         res.render('forgot-password');
     }
@@ -248,7 +257,6 @@ class userController {
                 try {
                     const payload = jwt.verify(req.params.token, secret);
                     user.password = password;
-                    //console.log(user);
                     res.send('Password updated');
                 } catch (err) {
                     console.log(err);
@@ -260,15 +268,52 @@ class userController {
             })
     }
 
-    // [GET] /test/profile
-    getProfile(req, res, next) {    
+    // [GET] /user/profile
+    renderProfile(req, res, next) {    
         let user = req.user;
         res.render('profile', {user});
     }
+
+    // [GET] /user/settings
+    renderUserSettings(req, res, next) {
+        let user = req.user;
+        res.render('user-settings', {user});
+    }
+
+    // [POST] /user/settings
+    saveUserSettings(req, res, next) {
+        const { _id, username, picture, family_name, given_name, gender, phone } = req.user;
+        const oldFilePath = path.join(__dirname, '..', 'public', 'upload', 'avatar', picture);
+        if (req.file) {
+            if (fs.existsSync(oldFilePath)) {
+                unlink(oldFilePath, err => {
+                    if (err) {
+                        console.log(err);
+                        res.send('Error when deleting an existed image');
+                    }
+                });
+            }
+            var filename = req.file.filename;
+        } else {
+            var filename = picture;
+        }
+        
+        UserModel.findByIdAndUpdate(_id, {
+            username: username,
+            picture: filename,
+            family_name: family_name,
+            given_name: given_name, 
+            gender: gender,
+            phone: phone,
+        })
+            .then(user => {
+                res.redirect(`/user/settings`);
+            })
+    }
     
-    // [GET]] /test/protected-route
-    getProtectedRoute(req, res, next) {
-        res.send('<br><br><br><center><h1>Có thể bạn thừa biết: Lý do bạn còn ế là do nhạt bormej!</h1></center>');
+    // [GET]] /user/protected-route
+    renderProtectedRoute(req, res, next) {
+        res.send('<br><br><br><center><h1>Chào mừng bạn đến với Tiro!</h1></center>');
     }
 
     // [GET] /user/logout

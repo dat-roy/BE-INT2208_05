@@ -6,12 +6,23 @@
     <title>Document</title>
 </head>
 <body>
-  
-    <h1>Hi <%= user.email %></h1>
-    <img src="<%= user.picture %>" alt="user-avatar">
+    <h1>PROFILE</h1>
+    Avatar: <img src="/upload/avatar/<%= user.picture %>" alt="user-avatar" style="width: 150px; height: auto; border-radius: 30%;">
     <br><br>
-    <a href="/"> Home </a> |
-    <a href="/user/logout">Sign Out</a>
-
+    Username: <%=user.username%>
+    <br><br>
+    Email: <%= user.email %>
+    <br><br>
+    First name: <%= user.family_name %>
+    <br><br>
+    Last name: <%= user.given_name %>
+    <br><br>
+    Gender: <%=user.gender%>
+    <br><br>
+    Phone: <%=user.phone%>
+    <br><br>
+    <a href="/user/settings"><b>Change</b></a>
+    <br><br>
+    <a href="/"> Home </a> | <a href="/user/logout">Sign Out</a>
 </body>
 </html>

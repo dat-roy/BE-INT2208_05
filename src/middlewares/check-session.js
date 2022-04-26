@@ -1,10 +1,8 @@
 const UserModel = require('../models/user.model.js');
 const jwt = require('jsonwebtoken');
-const { response } = require('express');
+const JWTPrivateKey = "TiroAccounts";
 
 function checkSession(req, res, next) {
-    const JWTPrivateKey = "TiroAccounts";
-
     let token = req.cookies['session-token'];
     try {
         //Default algorithm: HMAC SHA256
