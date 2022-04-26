@@ -43,7 +43,7 @@ class userController {
                 if (err) {
                     console.log('Bcrypt: ', err);
                     res.send('Error');
-                    return err;
+                    return;
                 }
                 let userRecord = new UserModel({
                     username: username,
@@ -74,7 +74,7 @@ class userController {
                         transporter.sendMail(info, (err, data) => {
                             if (err) {
                                 console.log('Sending email error: ', err);
-                                res.send(err);
+                                res.send('Error when sending an email');
                             } else {
                                 console.log('Email sent');
                                 res.render('confirm-register', {user});
@@ -83,7 +83,7 @@ class userController {
                     })
                     .catch(err => {
                         console.log(err);
-                        res.send(err);
+                        res.send('Error when saving user infomation to DB');
                     });
             })
         
@@ -115,7 +115,6 @@ class userController {
             })
     }
 
-
     // [GET] /test/login
     login(req, res, next) {
         res.render('login');
@@ -128,11 +127,6 @@ class userController {
 
         UserModel.findOne({ $or: [{email: account}, {phone: account}] })
         .then(user => {
-            if (! user) {
-                res.send("User not found.");
-                return;
-            }
-
             //Check password in DB:
             bcrypt.compare(password, user.password)
             .then( result => {
@@ -145,8 +139,11 @@ class userController {
                     res.redirect('/test/profile');
                 }
             });
-            
         })
+        .catch(err => {
+            console.log(err);
+            res.send('User not found.');
+        });
     }
 
     // [POST] /user/auth/google-login
@@ -170,7 +167,10 @@ class userController {
                 res.cookie('session-token', token);
                 res.redirect('/test/profile');
             })
-            .catch(console.error);
+            .catch((err) => {
+                console.log(err);
+                res.send('Error when verifying Google account.');
+            });
     }
 
     // [GET] /test/forgot-password
@@ -211,6 +211,7 @@ class userController {
             })
             .catch(err => {
                 console.log(err);
+                res.send('This email does not exist in DB.');
             });
     }
 
