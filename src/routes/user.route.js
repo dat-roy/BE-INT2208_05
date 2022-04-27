@@ -21,7 +21,7 @@ router.post('/auth/google-login', userController.verifyGoogleLogin);
 router.post('/forgot-password', userController.forgotPassword);
 router.get('/reset-password/:id/:token', userController.viewResetPassword);
 router.post('/reset-password/:id/:token', userController.resetPassword);
-router.post('/settings', checkSession, upload.single('avatar'), userController.saveUserSettings);
+router.post('/settings', checkSession, upload('avatar').single('avatar'), userController.saveUserSettings);
 router.get('/logout', userController.logout);
 
 module.exports = router;
