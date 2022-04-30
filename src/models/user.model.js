@@ -17,7 +17,7 @@ const UserSchema = new Schema(
             image_url: {type: Boolean, default: 'false'},
         },
         role: {type: String, default: ''},
-        gender: {type: String, default: "None"},
+        gender: {type: String, default: "other"},
         slug: { type: String, slug: 'email', unique: true },
     },
     {
