@@ -342,7 +342,9 @@ class userController {
 
     // [POST] /user/settings
     saveUserSettings(req, res, next) {
-        const { _id, username, picture, family_name, given_name, gender, phone } = req.user;
+        const { _id, picture} = req.user;
+        const {username, family_name, given_name, gender, phone} = req.body;
+        //console.log(gender);
         let filename;
         if (!picture.image_url && picture.name) 
         {
@@ -374,7 +376,7 @@ class userController {
             phone: phone,
         })
         .then(user => {
-            res.redirect(`/user/settings`);
+            res.redirect(`/user/profile`);
         })
     }
     
