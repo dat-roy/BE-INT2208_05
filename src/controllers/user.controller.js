@@ -144,14 +144,14 @@ class userController {
         const {token} = req.params;
         try {
             const payload = jwt.verify(token, JWTPrivateKey);
-            const id = payload._id;
+            const email = payload.email;
             //Update email_verified:
-            UserModel.findByIdAndUpdate(id, {email_verified: true})
-            .then(() => {
+            UserModel.findOneAndUpdate({ email: email }, {email_verified: true})
+            .then(user => {
                 res.render('activate', {email: user.email});
             })
             .catch(() => {
-                res.render('Error when activating!');
+                res.send('Error when activating!');
             })
         } catch (err) {
             console.log(err.message);
