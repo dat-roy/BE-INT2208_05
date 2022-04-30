@@ -12,7 +12,10 @@ const UserSchema = new Schema(
         email_verified: { type: Boolean, default: 'false' },
         phone: { type: String, default: '' },
         password: { type: String, default: '' },
-        picture: { type: String, default: ''},
+        picture: { 
+            name: {type: String, default: '',},
+            image_url: {type: Boolean, default: 'false'},
+        },
         role: {type: String, default: ''},
         gender: {type: String, default: "None"},
         slug: { type: String, slug: 'email', unique: true },

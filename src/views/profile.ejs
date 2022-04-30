@@ -7,11 +7,14 @@
 </head>
 <body>
     <h1>PROFILE</h1>
-    Avatar: <img src="/upload/avatar/<%= user.picture %>" alt="user-avatar" style="width: 150px; height: auto; border-radius: 30%;">
+    Avatar: 
+    <img src="<% if (user.picture.image_url) {%><%=user.picture.name%><%} else {%>/upload/avatar/<%=user.picture.name%><%}%>" alt="user-avatar" style="width: 150px; height: auto; border-radius: 30%;">
     <br><br>
     Username: <%=user.username%>
     <br><br>
     Email: <%= user.email %>
+    <br><br>
+    Is verified: <% if (user.email_verified){%><b style="color:green;">true</b> <%} else {%><b style="color:red;">false</b><%} %>
     <br><br>
     First name: <%= user.family_name %>
     <br><br>

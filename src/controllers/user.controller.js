@@ -52,7 +52,7 @@ class userController {
             bcrypt.hash(password, saltRounds, (err, hashedPwd) => {
                 if (err) {
                     console.log('Bcrypt: ', err);
-                    res.send('Error');
+                    res.send('Error when hash password with bcrypt!');
                     return;
                 }
                 let userRecord = new UserModel({
@@ -62,39 +62,77 @@ class userController {
                     password: hashedPwd,
                 });
                 userRecord.save()
-                    .then(user => {
-                        console.log("Saved a new user.");
-                        //Email verification:
-                        const payload = {
-                            email: user.email,
-                        };
-                        let token = jwt.sign(payload, JWTPrivateKey + user.password);
-                        const link = `http://localhost:3000/user/activate-account/${user.id}/${token}`;
+                .then(user => {
+                    console.log("Saved a new user.");
+                    //Email verification:
+                    const payload = {
+                        email: user.email,
+                    };
+                    let token = jwt.sign(payload, JWTPrivateKey + user.password);
+                    const link = `http://localhost:3000/user/activate-account/${user.id}/${token}`;
 
-                        let info = {
-                            from: {
-                                name: "Tiro Accounts",
-                                address: "group7.int2208@gmail.com",
-                            },
-                            to: `${user.email}`,                         
-                            subject: "Tiro Account Activation.",          
-                            text: link,         
-                        };
+                    let info = {
+                        from: {
+                            name: "Tiro Accounts",
+                            address: "group7.int2208@gmail.com",
+                        },
+                        to: `${user.email}`,                         
+                        subject: "Tiro Account Activation.",          
+                        text: link,         
+                    };
 
-                        transporter.sendMail(info, (err, data) => {
-                            if (err) {
-                                console.log('Sending email error: ', err);
-                                res.send('Error when sending an email');
-                            } else {
-                                console.log('Email sent');
-                                res.render('confirm-register', {user});
-                            }
-                        });
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.send('Error when saving user infomation to DB');
+                    transporter.sendMail(info, (err, data) => {
+                        if (err) {
+                            console.log('Sending email error: ', err);
+                            res.send('Error when sending an email');
+                        } else {
+                            console.log('Email sent');
+                            res.render('confirm-register', {user});
+                        }
                     });
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.send('Error when saving user infomation to DB');
+                });
+            })
+        
+        })
+    }
+
+    // [POST] /user/register-with-google
+    submitRegisterWithGoogle(req, res, next) {
+        const {username, email, phone, password} = req.body;
+
+        //Check existing username & email & phone in DB:
+        UserModel.findOne( { $or: [ {username: username}, {phone: phone}] } )
+        .then( user => {
+            if (user) {
+                res.send('Your username / phone number is already used');
+                return;
+            }
+            bcrypt.hash(password, saltRounds, (err, hashedPwd) => {
+                if (err) {
+                    console.log('Bcrypt: ', err);
+                    res.send('Error when hash password with bcrypt!');
+                    return;
+                }
+                UserModel.findOneAndUpdate({ email: email }, 
+                    {
+                        username: username,
+                        phone: phone,
+                        password: hashedPwd,
+                    },
+                )
+                .then(user => {
+                    let token = jwt.sign({ email: user.email }, JWTPrivateKey, {expiresIn: '3h'});
+                    res.cookie('session-token', token);
+                    res.redirect('/user/profile');
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.send('Error when saving user infomation to DB');
+                });
             })
         
         })
@@ -161,25 +199,51 @@ class userController {
         const client = new OAuth2Client(CLIENT_ID);
 
         let google_token = req.body.credential;
-        let token;
+        let email;
+        let payload;
         async function verify() {
             const ticket = await client.verifyIdToken({
                 idToken: google_token,
                 audience: CLIENT_ID,  
             });
-            const payload = ticket.getPayload();
-
-            token = jwt.sign({ email: payload.email }, JWTPrivateKey, {expiresIn: '3h'});
+            payload = ticket.getPayload();
+            email = payload.email;
         }
         verify()
-            .then(()=>{
-                res.cookie('session-token', token);
-                res.redirect('/user/profile');
-            })
-            .catch((err) => {
-                console.log(err);
-                res.send('Error when verifying Google account.');
+        .then(()=>{
+            UserModel.findOne({ email: email })
+            .then(user => {
+                if (user && user.username && user.phone && user.password) {
+                    let token = jwt.sign({ email: email }, JWTPrivateKey, {expiresIn: '3h'});
+                    res.cookie('session-token', token);
+                    res.redirect('/user/profile');
+                } else {
+                    const {email, given_name, family_name, picture, email_verified} = payload;
+                    let userRecord = new UserModel({
+                        email: email,
+                        given_name: given_name,
+                        family_name: family_name,
+                        picture: {
+                            name: picture,
+                            image_url: true,
+                        },
+                        email_verified: email_verified,
+                    });
+                    userRecord.save()
+                    .then(user => {
+                        res.render('register-with-google', { email: email });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.send('Error when saving user infomation to DB');
+                    });
+                }
             });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.send('Error when verifying Google account.');
+        });
     }
 
     // [GET] /user/forgot-password
@@ -283,24 +347,31 @@ class userController {
     // [POST] /user/settings
     saveUserSettings(req, res, next) {
         const { _id, username, picture, family_name, given_name, gender, phone } = req.user;
-        const oldFilePath = path.join(__dirname, '..', 'public', 'upload', 'avatar', picture);
-        if (req.file) {
-            if (fs.existsSync(oldFilePath)) {
-                unlink(oldFilePath, err => {
-                    if (err) {
-                        console.log(err);
-                        res.send('Error when deleting an existed image');
-                    }
-                });
+        let filename;
+        if (picture.image_url == false && picture.name) 
+        {
+            const oldFilePath = path.join(__dirname, '..', 'public', 'upload', 'avatar', picture.name);
+            if (req.file) {
+                if (fs.existsSync(oldFilePath)) {
+                    unlink(oldFilePath, err => {
+                        if (err) {
+                            console.log(err);
+                            res.send('Error when deleting an existed image');
+                        }
+                    });
+                }
+                filename = req.file.filename;
+            } else {
+                filename = picture.name;
             }
-            var filename = req.file.filename;
-        } else {
-            var filename = picture;
         }
         
         UserModel.findByIdAndUpdate(_id, {
             username: username,
-            picture: filename,
+            picture: {
+                name: filename,
+                image_url: false,
+            },
             family_name: family_name,
             given_name: given_name, 
             gender: gender,

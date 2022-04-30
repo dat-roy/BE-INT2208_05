@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Change user infomation</h1>
-    <img src="/upload/avatar/<%= user.picture %>" alt="user-avatar" style="width: 150px; height: auto; border-radius: 30%;">
+    <img src="<% if (user.picture.image_url) {%><%=user.picture.name%><%} else {%>/upload/avatar/<%=user.picture.name%><%}%>" alt="user-avatar" style="width: 150px; height: auto; border-radius: 30%;">
     <br><br>
     
     <form action="" method="POST" enctype="multipart/form-data">
