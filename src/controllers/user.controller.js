@@ -55,45 +55,46 @@ class userController {
                     res.send('Error when hash password with bcrypt!');
                     return;
                 }
-                let userRecord = new UserModel({
-                    username: username,
+
+                //Email verification:
+                const payload = {
                     email: email,
-                    phone: phone,
-                    password: hashedPwd,
-                });
-                userRecord.save()
-                .then(user => {
-                    console.log("Saved a new user.");
-                    //Email verification:
-                    const payload = {
-                        email: user.email,
-                    };
-                    let token = jwt.sign(payload, JWTPrivateKey + user.password);
-                    const link = `http://localhost:3000/user/activate-account/${user.id}/${token}`;
+                };
+                let token = jwt.sign(payload, JWTPrivateKey);
+                const link = `http://localhost:3000/user/activate-account/${token}`;
 
-                    let info = {
-                        from: {
-                            name: "Tiro Accounts",
-                            address: "group7.int2208@gmail.com",
-                        },
-                        to: `${user.email}`,                         
-                        subject: "Tiro Account Activation.",          
-                        text: link,         
-                    };
+                let info = {
+                    from: {
+                        name: "Tiro Accounts",
+                        address: "group7.int2208@gmail.com",
+                    },
+                    to: `${email}`,                         
+                    subject: "Tiro Account Activation.",          
+                    text: link,         
+                };
 
-                    transporter.sendMail(info, (err, data) => {
-                        if (err) {
-                            console.log('Sending email error: ', err);
-                            res.send('Error when sending an email');
-                        } else {
-                            console.log('Email sent');
+                transporter.sendMail(info, (err, data) => {
+                    if (err) {
+                        console.log('Sending email error: ', err);
+                        res.send('Error when sending an email');
+                    } else {
+                        console.log('Email sent');
+                        let userRecord = new UserModel({
+                            username: username,
+                            email: email,
+                            phone: phone,
+                            password: hashedPwd,
+                        });
+                        userRecord.save()
+                        .then(user => {
+                            console.log("Saved a new user.");
                             res.render('confirm-register', {user});
-                        }
-                    });
-                })
-                .catch(err => {
-                    console.log(err);
-                    res.send('Error when saving user infomation to DB');
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            res.send('Error when saving user infomation to DB');
+                        });
+                    }
                 });
             })
         
@@ -138,29 +139,24 @@ class userController {
         })
     }
 
-    // [GET] /user/activate-account/:id/:token
+    // [GET] /user/activate-account/:token
     activateAccount(req, res, next) {
-        let {token} = req.params;
-        UserModel.findOne({_id: req.params.id})
-            .then(user => {
-                try {
-                    const payload = jwt.verify(token, JWTPrivateKey + user.password);
-                    //Update email_verified:
-                    UserModel.findByIdAndUpdate(req.params.id, {email_verified: true})
-                        .then(() => {
-                            res.render('activate', {email: user.email});
-                        })
-                        .catch(() => {
-                            res.render('Error when activating!');
-                        })
-                } catch (err) {
-                    console.log(err.message);
-                    res.send('Invalid or expired token!');
-                }
+        const {token} = req.params;
+        try {
+            const payload = jwt.verify(token, JWTPrivateKey);
+            const id = payload._id;
+            //Update email_verified:
+            UserModel.findByIdAndUpdate(id, {email_verified: true})
+            .then(() => {
+                res.render('activate', {email: user.email});
             })
             .catch(() => {
-                res.send('Invalid user id!');
+                res.render('Error when activating!');
             })
+        } catch (err) {
+            console.log(err.message);
+            res.send('Invalid or expired token!');
+        }
     }
 
     // [GET] /user/login
@@ -255,81 +251,81 @@ class userController {
     forgotPassword(req, res, next) {
 
         UserModel.findOne({email: req.body.email})
-            .then(user => {
-                const payload = {
-                    email: user.email,
-                };
-                let token = jwt.sign(payload, JWTPrivateKey + user.password, {expiresIn: '15m'});
-                const link = `http://localhost:3000/user/reset-password/${user.id}/${token}`;
+        .then(user => {
+            const payload = {
+                email: user.email,
+            };
+            let token = jwt.sign(payload, JWTPrivateKey + user.password, {expiresIn: '15m'});
+            const link = `http://localhost:3000/user/reset-password/${user.id}/${token}`;
 
-                let info = {
-                    from: {
-                        name: "Tiro Accounts",
-                        address: "group7.int2208@gmail.com",
-                    },
-                    to: `${user.email}`,                         
-                    subject: "Reset your Tiro password.",          
-                    text: link,         
-                };
+            let info = {
+                from: {
+                    name: "Tiro Accounts",
+                    address: "group7.int2208@gmail.com",
+                },
+                to: `${user.email}`,                         
+                subject: "Reset your Tiro password.",          
+                text: link,         
+            };
 
-                transporter.sendMail(info, (err, data) => {
-                    if (err) {
-                        console.log('Error while sending mail: ', err);
-                        res.send(err);
-                    } else {
-                        console.log('Email sent');
-                        res.send('Password reset link has been sent to your email...');
-                    }
-                });
-            })
-            .catch(err => {
-                console.log(err);
-                res.send('This email does not exist in DB.');
+            transporter.sendMail(info, (err, data) => {
+                if (err) {
+                    console.log('Error while sending mail: ', err);
+                    res.send(err);
+                } else {
+                    console.log('Email sent');
+                    res.send('Password reset link has been sent to your email...');
+                }
             });
+        })
+        .catch(err => {
+            console.log(err);
+            res.send('This email does not exist in DB.');
+        });
     }
 
     // [GET] /user/reset-password/:id/:token
     viewResetPassword(req, res, next) {
         let {token} = req.params;
         UserModel.findOne({_id: req.params.id})
-            .then(user => {
-                try {
-                    const payload = jwt.verify(token, JWTPrivateKey + user.password);
-                    res.render('reset-password', {email: user.email});
-                } catch (err) {
-                    console.log(err.message);
-                    res.send('Invalid or expired token!');
-                }
-            })
-            .catch(() => {
-                res.send('Invalid user id!');
-            })
+        .then(user => {
+            try {
+                const payload = jwt.verify(token, JWTPrivateKey + user.password);
+                res.render('reset-password', {email: user.email});
+            } catch (err) {
+                console.log(err.message);
+                res.send('Invalid or expired token!');
+            }
+        })
+        .catch(() => {
+            res.send('Invalid user id!');
+        })
     }
     
     // [POST] /user/reset-password/:id/:token
     resetPassword(req, res, next) {
         UserModel.findOne({_id: req.params.id})
-            .then( user => {
-                const { password, confirm_password } = req.body;
-                if (password !== confirm_password) {
-                    return;
-                } else if (password.length <2) {
-                    return;
-                }
+        .then( user => {
+            const { password, confirm_password } = req.body;
+            if (password !== confirm_password) {
+                return;
+            } else if (password.length <2) {
+                return;
+            }
 
-                const secret = JWTPrivateKey + user.password;
-                try {
-                    const payload = jwt.verify(req.params.token, secret);
-                    user.password = password;
-                    res.send('Password updated');
-                } catch (err) {
-                    console.log(err);
-                    res.send('Invalid or expired token!');
-                }
-            })
-            .catch(() => {
-                res.send('Invalid user id!');
-            })
+            const secret = JWTPrivateKey + user.password;
+            try {
+                const payload = jwt.verify(req.params.token, secret);
+                user.password = password;
+                res.send('Password updated');
+            } catch (err) {
+                console.log(err);
+                res.send('Invalid or expired token!');
+            }
+        })
+        .catch(() => {
+            res.send('Invalid user id!');
+        })
     }
 
     // [GET] /user/profile
@@ -348,7 +344,7 @@ class userController {
     saveUserSettings(req, res, next) {
         const { _id, username, picture, family_name, given_name, gender, phone } = req.user;
         let filename;
-        if (picture.image_url == false && picture.name) 
+        if (!picture.image_url && picture.name) 
         {
             const oldFilePath = path.join(__dirname, '..', 'public', 'upload', 'avatar', picture.name);
             if (req.file) {
@@ -377,9 +373,9 @@ class userController {
             gender: gender,
             phone: phone,
         })
-            .then(user => {
-                res.redirect(`/user/settings`);
-            })
+        .then(user => {
+            res.redirect(`/user/settings`);
+        })
     }
     
     // [GET]] /user/protected-route

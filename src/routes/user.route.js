@@ -16,7 +16,7 @@ router.get('/protected-route', checkSession, userController.renderProtectedRoute
 
 router.post('/register', userController.submitRegister);
 router.post('/register-with-google', userController.submitRegisterWithGoogle);
-router.get('/activate-account/:id/:token', userController.activateAccount);
+router.get('/activate-account/:token', userController.activateAccount);
 router.post('/auth/login', userController.verifyLogin);
 router.post('/auth/google-login', userController.verifyGoogleLogin);
 router.post('/forgot-password', userController.forgotPassword);

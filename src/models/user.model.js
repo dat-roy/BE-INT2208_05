@@ -13,7 +13,7 @@ const UserSchema = new Schema(
         phone: { type: String, default: '' },
         password: { type: String, default: '' },
         picture: { 
-            name: {type: String, default: '',},
+            name: {type: String, default: 'default.jpg',},
             image_url: {type: Boolean, default: 'false'},
         },
         role: {type: String, default: ''},
