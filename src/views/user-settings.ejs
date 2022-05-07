@@ -22,7 +22,14 @@
         <br><br>
         Last name: <input type="text" name="given_name" value="<%= user.given_name %>">
         <br><br>
-        Gender: <input type="text" value="<%=user.gender%>">
+        Gender:
+        <input type="radio" name="gender" id="male" value="male" <% if (user.gender == 'male') {%>checked<%}%>> 
+        <label for="male">Male</label> 
+        <input type="radio" name="gender" id="female" value="female" <% if (user.gender == 'female') {%>checked<%}%>> 
+        <label for="female">Female</label>
+        <input type="radio" name="gender" id="other" value="other" <% if (user.gender == 'other') {%>checked<%}%>> 
+        <label for="other">Other</label>
+
         <br><br>
         Phone: <input type="tel" name="phone" id="" value="<%=user.phone%>">
         <br><br>
