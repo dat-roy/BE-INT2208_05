@@ -199,47 +199,52 @@ class userController {
         async function verify() {
             const ticket = await client.verifyIdToken({
                 idToken: google_token,
-                audience: CLIENT_ID,
+                audience: CLIENT_ID,  
             });
             payload = ticket.getPayload();
             email = payload.email;
         }
-
         verify()
-            .then(() => {
-                UserModel.findOne({ email: email })
-                    .then(user => {
-                        if (user && user.username && user.phone && user.password) {
-                            let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
-                            res.cookie('session-token', token);
-                            // res.redirect('/user/profile');
-                        } else {
-                            const { email, given_name, family_name, picture, email_verified } = payload;
-                            let userRecord = new UserModel({
-                                email: email,
-                                given_name: given_name,
-                                family_name: family_name,
-                                picture: {
-                                    name: picture,
-                                    image_url: true,
-                                },
-                                email_verified: email_verified,
-                            });
-                            userRecord.save()
-                                .then(user => {
-                                    res.render('register-with-google', { email: email });
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                    res.send('Error when saving user infomation to DB');
-                                });
-                        }
+        .then(()=>{
+            UserModel.findOne({ email: email })
+            .then(user => {
+                //Check existing user
+                if (user) {
+                    if (user.username && user.phone && user.password) {
+                        let token = jwt.sign({ email: email }, JWTPrivateKey, {expiresIn: '3h'});
+                        res.cookie('session-token', token);
+                        res.redirect('/user/profile');
+                    } else {
+                        res.render('register-with-google', { email: email });
+                    }
+                    
+                } else {
+                    const {email, given_name, family_name, picture, email_verified} = payload;
+                    let userRecord = new UserModel({
+                        email: email,
+                        given_name: given_name,
+                        family_name: family_name,
+                        picture: {
+                            name: picture,
+                            image_url: true,
+                        },
+                        email_verified: email_verified,
                     });
-            })
-            .catch((err) => {
-                console.log(err);
-                res.send('Error when verifying Google account.');
+                    userRecord.save()
+                    .then(user => {
+                        res.render('register-with-google', { email: email });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.send('Error when saving user infomation to DB');
+                    });
+                }
             });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.send('Error when verifying Google account.');
+        });
     }
 
     // [GET] /user/forgot-password
