@@ -14,7 +14,7 @@ const saltRounds = 10;
 // Default algorithm: HMAC SHA256
 const JWTPrivateKey = "TiroAccounts";
 
-// Google Auth]
+// Google Auth
 const { OAuth2Client } = require('google-auth-library');
 const userModel = require('../models/user.model.js');
 const CLIENT_ID = '823357101372-fcr2i1ngeimfjbtqf775sgp112tijhco.apps.googleusercontent.com';
@@ -134,8 +134,7 @@ class userController {
                             console.log(err);
                             res.send('Error when saving user infomation to DB');
                         });
-                })
-
+                });
             })
     }
 
