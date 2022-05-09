@@ -18,6 +18,7 @@ const UserSchema = new Schema(
         },
         role: {type: String, default: ''},
         gender: {type: String, default: "other"},
+        theme: {type: String, default: ''},
         slug: { type: String, slug: 'email', unique: true },
     },
     {
