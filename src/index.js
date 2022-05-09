@@ -8,12 +8,13 @@ const dotenv = require('dotenv');
 dotenv.config({path: 'src/.env'});
 
 //Get hostname & port
-const hostname = process.env.HOST;
+const backendHostName = process.env.BACKEND_HOST;
+const frontendHostName = process.env.FRONTEND_HOST;
 const FE_PORT = process.env.FE_PORT;
 const BE_PORT = process.env.BE_PORT;
 
 const corsOptions = {
-    origin: `http://${hostname}:${FE_PORT}`,
+    origin: `http://${frontendHostName}:${FE_PORT}`,
     credentials: true,            //access-control-allow-credentials:true
     optionSuccessStatus: 200
 }
@@ -44,6 +45,6 @@ app.set('views', path.join(__dirname, 'views'));
 //Routes init
 initRoutes(app);
 
-app.listen(BE_PORT, hostname, () => {
+app.listen(BE_PORT, backendHostName, () => {
     console.log(`Running on port ${BE_PORT}`);
 })

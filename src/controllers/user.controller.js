@@ -7,6 +7,13 @@ const multer = require('multer');
 const fs = require('fs');
 const { unlink } = require('fs');
 
+// TODO: Chuyển cái này sang chỗ khác phù hợp
+const AccountStatus = Object.freeze({
+    NEW_ACCOUNT: "NEW_ACCOUNT",
+    EXISTENT_ACCOUNT: "EXISTENT_ACCOUNT",
+});
+
+
 // Google Auth
 const { OAuth2Client } = require('google-auth-library');
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -189,6 +196,12 @@ class userController {
     }
 
     // [POST] /user/auth/google-login
+
+    /*
+    * View in Readme.md
+    */
+
+    // TODO: Toi uu code cua ham nay
     verifyGoogleLogin(req, res, next) {
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -198,52 +211,83 @@ class userController {
         async function verify() {
             const ticket = await client.verifyIdToken({
                 idToken: google_token,
-                audience: GOOGLE_CLIENT_ID,  
+                audience: GOOGLE_CLIENT_ID,
             });
             payload = ticket.getPayload();
             email = payload.email;
         }
+
+        res.setHeader('Content-Type', 'application/json');
+
         verify()
-        .then(()=>{
-            UserModel.findOne({ email: email })
-            .then(user => {
-                //Check existing user
-                if (user) {
-                    if (user.username && user.phone && user.password) {
-                        let token = jwt.sign({ email: email }, JWTPrivateKey, {expiresIn: '3h'});
-                        res.cookie('session-token', token);
-                        res.redirect('/user/profile');
-                    } else {
-                        res.render('register-with-google', { email: email });
-                    }
-                    
-                } else {
-                    const {email, given_name, family_name, picture, email_verified} = payload;
-                    let userRecord = new UserModel({
-                        email: email,
-                        given_name: given_name,
-                        family_name: family_name,
-                        picture: {
-                            name: picture,
-                            image_url: true,
-                        },
-                        email_verified: email_verified,
-                    });
-                    userRecord.save()
+            .then(() => {
+                UserModel.findOne({ email: email })
                     .then(user => {
-                        res.render('register-with-google', { email: email });
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.send('Error when saving user infomation to DB');
+                        if (user) {
+                            if (user.username && user.phone && user.password) {
+                                let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
+                                res.cookie('session-token', token);
+                                res.end(JSON.stringify({
+                                    is_correct: true,
+                                    account_status: AccountStatus.EXISTENT_ACCOUNT,
+                                    code: '000',
+                                    message: 'Login successfully!',
+                                    user_data: user
+                                }));
+                            } else {
+                                // TODO: Fix cai nay cho no hop ly
+                                res.end(JSON.stringify({
+                                    is_correct: true,
+                                    account_status: AccountStatus.EXISTENT_ACCOUNT,
+                                    code: '000',
+                                    message: 'Login successfully!',
+                                    user_data: user
+                                }));
+                            }
+                        } else {
+                            const { email, given_name, family_name, picture, email_verified } = payload;
+                            let userRecord = new UserModel({
+                                email: email,
+                                given_name: given_name,
+                                family_name: family_name,
+                                picture: {
+                                    name: picture,
+                                    image_url: true,
+                                },
+                                email_verified: email_verified,
+                            });
+                            userRecord.save()
+                                .then((user) => {
+                                    res.end(JSON.stringify({
+                                        is_correct: true,
+                                        account_status: AccountStatus.NEW_ACCOUNT,
+                                        code: '000',
+                                        message: 'Create account successfully!',
+                                        user_data: user
+                                    }));
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                    res.end(JSON.stringify({
+                                        is_correct: false,
+                                        account_status: undefined,
+                                        code: '001',
+                                        message: 'Error when saving user information to DB: ' + err.message,
+                                        user_data: undefined
+                                    }));
+                                });
+                        }
                     });
-                }
+            })
+            .catch((err) => {
+                console.log(err);
+                res.end(JSON.stringify({
+                    is_correct: false,
+                    account_status: undefined,
+                    code: '001',
+                    message: 'Error when verifying Google account: ' + err.message
+                }));
             });
-        })
-        .catch((err) => {
-            console.log(err);
-            res.send('Error when verifying Google account.');
-        });
     }
 
     // [GET] /user/forgot-password
