@@ -6,6 +6,8 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const fs = require('fs');
 const { unlink } = require('fs');
+const dotenv = require('dotenv');
+dotenv.config({path: 'src/.env'});
 
 // TODO: Chuyển cái này sang chỗ khác phù hợp
 const AccountStatus = Object.freeze({
