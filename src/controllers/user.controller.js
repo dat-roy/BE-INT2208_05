@@ -7,27 +7,26 @@ const multer = require('multer');
 const fs = require('fs');
 const { unlink } = require('fs');
 
-// [Bcrypt]
-const saltRounds = 10;
-
-// [JWT sign]
-// Default algorithm: HMAC SHA256
-const JWTPrivateKey = "TiroAccounts";
-
 // Google Auth
 const { OAuth2Client } = require('google-auth-library');
-const userModel = require('../models/user.model.js');
-const CLIENT_ID = '823357101372-fcr2i1ngeimfjbtqf775sgp112tijhco.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 // [Nodemailer]
 // Create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "group7.int2208@gmail.com",
-        pass: "nhom7isthebest",
+        user: process.env.GOOGLE_EMAIL,
+        pass: process.env.GOOGLE_PWD,
     },
 });
+
+// [Bcrypt]
+const saltRounds = process.env.BCRYPT_SALT_ROUNDS;
+
+// [JWT sign]
+// Default algorithm: HMAC SHA256
+const JWTPrivateKey = process.env.JWT_PRIVATE_KEY;
 
 //===========================
 class userController {
@@ -61,12 +60,12 @@ class userController {
                         email: email,
                     };
                     let token = jwt.sign(payload, JWTPrivateKey);
-                    const link = `http://localhost:3030/user/activate-account/${token}`;
+                    const link = `http://${process.env.HOST}:${process.env.BE_PORT}/user/activate-account/${token}`;
 
                     let info = {
                         from: {
                             name: "Tiro Accounts",
-                            address: "group7.int2208@gmail.com",
+                            address: process.env.GOOGLE_EMAIL,
                         },
                         to: `${email}`,
                         subject: "Tiro Account Activation.",
@@ -160,7 +159,7 @@ class userController {
 
     // [GET] /user/login
     login(req, res, next) {
-        res.render('login', { client_id: CLIENT_ID });
+        res.render('login', { client_id: GOOGLE_CLIENT_ID });
     }
 
     // [POST] /user/auth/login
@@ -191,7 +190,7 @@ class userController {
 
     // [POST] /user/auth/google-login
     verifyGoogleLogin(req, res, next) {
-        const client = new OAuth2Client(CLIENT_ID);
+        const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
         let google_token = req.body.credential;
         let email;
@@ -199,7 +198,7 @@ class userController {
         async function verify() {
             const ticket = await client.verifyIdToken({
                 idToken: google_token,
-                audience: CLIENT_ID,  
+                audience: GOOGLE_CLIENT_ID,  
             });
             payload = ticket.getPayload();
             email = payload.email;
@@ -261,12 +260,12 @@ class userController {
                     email: user.email,
                 };
                 let token = jwt.sign(payload, JWTPrivateKey + user.password, { expiresIn: '15m' });
-                const link = `http://localhost:3030/user/reset-password/${user.id}/${token}`;
+                const link = `http://${process.env.HOST}:${process.env.BE_PORT}/user/reset-password/${user.id}/${token}`;
 
                 let info = {
                     from: {
                         name: "Tiro Accounts",
-                        address: "group7.int2208@gmail.com",
+                        address: process.env.GOOGLE_EMAIL,
                     },
                     to: `${user.email}`,
                     subject: "Reset your Tiro password.",

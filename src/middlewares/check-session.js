@@ -1,6 +1,6 @@
 const UserModel = require('../models/user.model.js');
 const jwt = require('jsonwebtoken');
-const JWTPrivateKey = "TiroAccounts";
+const JWTPrivateKey = process.env.JWT_PRIVATE_KEY;
 
 function checkSession(req, res, next) {
     let token = req.cookies['session-token'];
