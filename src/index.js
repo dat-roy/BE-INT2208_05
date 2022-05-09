@@ -4,15 +4,19 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const initRoutes = require('./routes/index.route.js');
 const cors = require('cors');
+const dotenv = require('dotenv');
+dotenv.config({path: 'src/.env'});
+
+//Get hostname & port
+const hostname = process.env.HOST;
+const FE_PORT = process.env.FE_PORT;
+const BE_PORT = process.env.BE_PORT;
+
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: `http://${hostname}:${FE_PORT}`,
     credentials: true,            //access-control-allow-credentials:true
     optionSuccessStatus: 200
 }
-
-//Define hostname & port
-const hostname = '127.0.0.1';
-const PORT = 3030;
 
 //Initialize app
 const app = express();
@@ -40,6 +44,6 @@ app.set('views', path.join(__dirname, 'views'));
 //Routes init
 initRoutes(app);
 
-app.listen(PORT, hostname, () => {
-    console.log(`Running on port ${PORT}`);
+app.listen(BE_PORT, hostname, () => {
+    console.log(`Running on port ${BE_PORT}`);
 })
