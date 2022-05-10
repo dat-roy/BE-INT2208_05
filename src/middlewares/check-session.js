@@ -13,14 +13,14 @@ function checkSession(req, res, next) {
                 req.user = user;
                 next();
             } else {
-                res.send('Your account has not been activated.');
+                res.status(403).json({'message': 'Your account has not been activated.'});
             }
         })
         .catch(() => {
-            res.send('Your account does not exist.');
+            res.status(404).json({'message': 'Your account does not exist.'});
         })
     } catch (err) {
-        res.send('Please login first!');
+        res.status(401).json({'message': 'Please login first!'});
     }
 }
 
