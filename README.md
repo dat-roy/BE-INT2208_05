@@ -39,8 +39,8 @@ Check if the GG id token given by user is valid or not
 ```json
     {
         "is_correct": boolean,
+        "enough_data": boolean,
         "account_status": AccountStatus,
-        "code": string,
         "message": string,
         "user_data": UserDataObject
     }
@@ -49,8 +49,8 @@ Check if the GG id token given by user is valid or not
 | key          | Description                                                                                                       |
 | ------------ | ----------------------------------------------------------------------------------------------------------------- |
 | is_correct   | `true` if the id token is valid and vice                                                                          |
+| enough_data  | `true` if data of {username, phone number, password} exist in DB                                                  |
 | account_type | `NEW_ACCOUNT`: Have create yet <br />`EXISTENT_ACCOUNT`: Old account <br /> `undefined`: When is_correct is false |
-| code         | response code                                                                                                     |
 | message      | server message                                                                                                    |
 | user_data    | User Data                                                                                                         |
 
