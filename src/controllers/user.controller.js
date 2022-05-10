@@ -203,93 +203,81 @@ class userController {
     * View in Readme.md
     */
 
-    // TODO: Toi uu code cua ham nay
-    verifyGoogleLogin(req, res, next) {
+    async verifyGoogleLogin(req, res, next) {
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+        const google_token = req.body.credential;
 
-        let google_token = req.body.credential;
-        let email;
-        let payload;
-        async function verify() {
+        try {
             const ticket = await client.verifyIdToken({
                 idToken: google_token,
                 audience: GOOGLE_CLIENT_ID,
             });
-            payload = ticket.getPayload();
-            email = payload.email;
-        }
-
-        res.setHeader('Content-Type', 'application/json');
-
-        verify()
-            .then(() => {
-                UserModel.findOne({ email: email })
-                    .then(user => {
-                        if (user) {
-                            if (user.username && user.phone && user.password) {
-                                let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
-                                res.cookie('session-token', token);
-                                res.end(JSON.stringify({
-                                    is_correct: true,
-                                    account_status: AccountStatus.EXISTENT_ACCOUNT,
-                                    code: '000',
-                                    message: 'Login successfully!',
-                                    user_data: user
-                                }));
-                            } else {
-                                // TODO: Fix cai nay cho no hop ly
-                                res.end(JSON.stringify({
-                                    is_correct: true,
-                                    account_status: AccountStatus.EXISTENT_ACCOUNT,
-                                    code: '000',
-                                    message: 'Login successfully!',
-                                    user_data: user
-                                }));
-                            }
-                        } else {
-                            const { email, given_name, family_name, picture, email_verified } = payload;
-                            let userRecord = new UserModel({
-                                email: email,
-                                given_name: given_name,
-                                family_name: family_name,
-                                picture: {
-                                    name: picture,
-                                    image_url: true,
-                                },
-                                email_verified: email_verified,
-                            });
-                            userRecord.save()
-                                .then((user) => {
-                                    res.end(JSON.stringify({
-                                        is_correct: true,
-                                        account_status: AccountStatus.NEW_ACCOUNT,
-                                        code: '000',
-                                        message: 'Create account successfully!',
-                                        user_data: user
-                                    }));
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                    res.end(JSON.stringify({
-                                        is_correct: false,
-                                        account_status: undefined,
-                                        code: '001',
-                                        message: 'Error when saving user information to DB: ' + err.message,
-                                        user_data: undefined
-                                    }));
-                                });
-                        }
+            const payload = ticket.getPayload();
+            const email = payload.email;
+            const existingUser = await UserModel.findOne({ email: email });
+            if (existingUser) {
+                if (existingUser.username && existingUser.phone && existingUser.password) {
+                    let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
+                    res.cookie('session-token', token);
+                    res.status(200).json({
+                        is_correct: true,
+                        enough_data: true, 
+                        account_status: AccountStatus.EXISTENT_ACCOUNT,
+                        message: 'Login successfully!',
+                        user_data: existingUser
                     });
-            })
-            .catch((err) => {
-                console.log(err);
-                res.end(JSON.stringify({
-                    is_correct: false,
-                    account_status: undefined,
-                    code: '001',
-                    message: 'Error when verifying Google account: ' + err.message
-                }));
+                } else {
+                    res.status(200).json({
+                        is_correct: true,
+                        enough_data: false,
+                        account_status: AccountStatus.EXISTENT_ACCOUNT,
+                        message: 'Have not yet completed user data',
+                        user_data: existingUser
+                    });
+                }
+            } else {
+                const { email, given_name, family_name, picture, email_verified } = payload;
+                let userRecord = new UserModel({
+                    email: email,
+                    given_name: given_name,
+                    family_name: family_name,
+                    picture: {
+                        name: picture,
+                        image_url: true,
+                    },
+                    email_verified: email_verified,
+                });
+                userRecord.save()
+                    .then((user) => {
+                        res.status(200).json({
+                            is_correct: true,
+                            enough_data: false,
+                            account_status: AccountStatus.NEW_ACCOUNT,
+                            message: 'Create new account successfully!',
+                            user_data: user
+                        });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(500).json({
+                            is_correct: false,
+                            enough_data: false,
+                            account_status: undefined,
+                            message: 'Error when saving user information to DB: ' + err.message,
+                            user_data: undefined
+                        });
+                    });
+            }
+        }
+        catch (err) {
+            console.log(err);
+            res.status(500).json({
+                is_correct: false,
+                account_status: undefined,
+                message: 'Error when verifying Google account: ' + err.message,
+                user_data: undefined
             });
+        }
     }
 
     // [GET] /user/forgot-password
