@@ -20,7 +20,7 @@
 
 ## Detail description
 
-<span style="color:#0cbb52; font-weight:700">GET</span>. **Verify Google Account**
+###<span style="color:#0cbb52; font-weight:700">GET</span>. **Verify Google Account**
 
 ```
     /user/auth/google-login
@@ -53,5 +53,26 @@ Check if the GG id token given by user is valid or not
 | account_type | `NEW_ACCOUNT`: Have create yet <br />`EXISTENT_ACCOUNT`: Old account <br /> `undefined`: When is_correct is false |
 | message      | server message                                                                                                    |
 | user_data    | User Data                                                                                                         |
+
+###<span style="color:#0cbb52; font-weight:700">GET</span>. **Activate Account**
+
+```
+/user/activate-account/:token
+```
+
+Activate account
+
+**_Params_**
+
+| key                   | Description                  |
+| --------------------- | ---------------------------- |
+| **_token_**: `string` | The Google token to activate |
+
+**_Redirect_** to _localhost:3000/?message=_
+
+| key     | Description          |
+| ------- | -------------------- |
+| message | The response message |
+| code    | Error code           |
 
 <span style="color:#ffb400; font-weight:700">POST</span>.

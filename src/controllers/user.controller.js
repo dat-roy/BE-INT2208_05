@@ -147,6 +147,9 @@ class userController {
     }
 
     // [GET] /user/activate-account/:token
+    /*
+    *  View in Readme.md
+    */
     activateAccount(req, res, next) {
         const { token } = req.params;
         try {
