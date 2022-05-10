@@ -100,7 +100,7 @@ class userController {
                                 })
                                 .catch(err => {
                                     console.log(err);
-                                    res.send('Error when saving user infomation to DB');
+                                    res.send('Error when saving user information to DB');
                                 });
                         }
                     });
@@ -147,6 +147,9 @@ class userController {
     }
 
     // [GET] /user/activate-account/:token
+    /*
+    *  View in Readme.md
+    */
     activateAccount(req, res, next) {
         const { token } = req.params;
         try {
