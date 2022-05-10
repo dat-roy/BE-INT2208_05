@@ -5,7 +5,7 @@ const path = require('path');
 const initRoutes = require('./routes/index.route.js');
 const cors = require('cors');
 const dotenv = require('dotenv');
-dotenv.config({path: 'src/.env'});
+dotenv.config();
 
 //Get hostname & port
 const backendHostName = process.env.BACKEND_HOST;
