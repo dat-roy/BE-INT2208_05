@@ -100,7 +100,7 @@ class userController {
                                 })
                                 .catch(err => {
                                     console.log(err);
-                                    res.send('Error when saving user infomation to DB');
+                                    res.send('Error when saving user information to DB');
                                 });
                         }
                     });

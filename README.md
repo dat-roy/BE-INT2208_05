@@ -75,4 +75,22 @@ Activate account
 | message | The response message |
 | code    | Error code           |
 
+###<span style="color:#0cbb52; font-weight:700">GET</span>. **Get user data**
+
+```
+/user/get
+```
+
+Get user data
+**_Payload_**
+
+| key                          | Description         |
+| ---------------------------- | ------------------- |
+| **_sessionToken_**: `string` | The token to verify |
+
+**_Response_**
+|key| Description|
+| ---------------------------- | ------------------- |
+|...|...|
+
 <span style="color:#ffb400; font-weight:700">POST</span>.
