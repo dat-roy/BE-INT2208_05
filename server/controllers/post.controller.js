@@ -60,8 +60,8 @@ class postController {
             })
     }
 
-    // [GET] /post/get-posts
-    getPostsByAuthorId(req, res, next) {
+    // [GET] /post/my-posts
+    getMyPosts(req, res, next) {
         PostModel.find({ author: req.user._id })
         .then(posts => {
             if (posts.length == 0) {

@@ -8,6 +8,7 @@ router.get('/new-post', checkSession, postController.renderCreateNewPost);
 
 //Server
 router.post('/new-post', checkSession, postController.createNewPost);
-router.get('/get-posts', checkSession, postController.getPostsByAuthorId);
+router.get('/my-posts', checkSession, postController.getMyPosts);
+router.post('/search')
 
 module.exports = router;
