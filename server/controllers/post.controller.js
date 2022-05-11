@@ -81,6 +81,25 @@ class postController {
             });
         })
     }
+
+    // [POST] /post/search
+    searchPosts(req, res, next) {
+        
+        /*Request form data: 
+        /// NOTE: null value here means 'accepting all options'
+        {
+            room_type: String {null by default, ... }
+            gender: String, {null by default, 'male', 'female'}
+            area: String, {null by default, ...}
+            capacity: Number, {1 by default, 2, 3, ...}
+            min_price: Number, {null by default}
+            max_price: Number, {null by default}
+        }
+        */
+
+        
+
+    }
 }
 
 module.exports = new postController();
