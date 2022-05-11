@@ -2,12 +2,12 @@ const PostModel = require('../models/post.model.js');
 const UserModel = require('../models/user.model.js');
 
 class postController {
-    // [GET] /dashboard/new-post
+    // [GET] /post/new-post
     renderCreateNewPost(req, res, next) {
         res.render('create-new-post');
     }
 
-    // [POST] /dashboard/new-post
+    // [POST] /post/new-post
     createNewPost(req, res, next) {
         const postRecord = new PostModel({
             author: req.user._id,
@@ -60,8 +60,8 @@ class postController {
             })
     }
 
-    // [GET] /dashboard/my-posts
-    renderMyPosts(req, res, next) {
+    // [GET] /post/get-posts
+    getPostsByAuthorId(req, res, next) {
         PostModel.find({ author: req.user._id })
         .then(posts => {
             if (posts.length == 0) {

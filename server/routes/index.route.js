@@ -5,7 +5,7 @@ const siteRouter = require('./site.route.js');
 //======================//
 function initRoutes(app) {
     app.use('/user', userRouter);
-    app.use('/dashboard', postRouter);
+    app.use('/post', postRouter);
     app.use('/', siteRouter);
 }
 
