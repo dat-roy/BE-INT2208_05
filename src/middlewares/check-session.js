@@ -19,7 +19,10 @@ function checkSession(req, res, next) {
             next();
         })
     } catch (err) {
-        res.status(401).json({message: 'Please login first!'});
+        res.status(401).json({
+            message: `Please login first!`,
+            error: err.message
+        });
     }
 }
 
