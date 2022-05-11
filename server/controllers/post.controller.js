@@ -48,11 +48,15 @@ class postController {
         });
         postRecord.save()
             .then(post => {
-                res.redirect(`/dashboard/my-posts`);
+                res.status(200).json({
+                    message: 'Create new post successfully',
+                });
             }) 
             .catch(err => {
-                console.log(err);
-                res.send('Error when saving new post');
+                res.status(500).json({
+                    message: 'Error when saving new post',
+                    error: err.message,
+                });
             })
     }
 
@@ -61,39 +65,20 @@ class postController {
         PostModel.find({ author: req.user._id })
         .then(posts => {
             if (posts.length == 0) {
-                res.send('There is no post');
-                return;
+                return res.status(200).json({
+                    message: 'There is no post',
+                });
             }
-            var postList = [];
-            for (const post of posts) {
-                UserModel.findById(post.author)
-                    .then(author => {
-                        postList.push({
-                            _id: post.id, 
-                            author: {
-                                username: author.username,
-                                email: author.email, 
-                                picture: author.picture, 
-                            }, 
-                            title: post.title, 
-                            address: post.address, 
-                            is_verified: post.is_verified, 
-                            createdAt: post.createdAt, 
-                            updatedAt: post.updatedAt, 
-                        });
-                        if (posts.indexOf(post) == posts.length - 1) 
-                            res.render('my-posts', {postList: postList});
-                            //console.log(postList);
-                    })
-                    .catch( err => {
-                        console.log(err);
-                        res.send('Posts not found');
-                    })
-            }
+            res.status(200).json({
+                message: 'Fetch all posts successfully',
+                posts_list: posts,
+            })
         })
         .catch(err => {
-            console.log(err);
-            res.send('Author not found');
+            res.status(404).json({
+                message: 'Author not found',
+                error: err.message,
+            });
         })
     }
 }
