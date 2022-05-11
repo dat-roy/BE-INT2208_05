@@ -41,7 +41,6 @@ class userController {
 
     // [POST] /user/register
     async submitRegister(req, res, next) {
-        //Request payload: {username, email, phone, password, confirm_password}
 
         const { username, email, phone, password } = req.body;
 
@@ -50,9 +49,9 @@ class userController {
         if (user) {
             return res.status(403).json({
                 message: `Username /email /phone number is already used.`,
-                existing_username: (username == user.username) ? username : undefined,
-                existing_email: (email == user.email) ? email : undefined,
-                existing_phone: (phone == user.phone) ? phone : undefined,
+                username_existed: (username == user.username) ? true : false,
+                email_existed: (email == user.email) ? true : false,
+                phone_existed: (phone == user.phone) ? true : false,
             });
         }
         bcrypt.hash(password, saltRounds, (err, hashedPwd) => {
@@ -119,8 +118,8 @@ class userController {
         if (user) {
             return res.status(403).json({
                 message: `Username/ phone number is already used`,
-                existing_username: (username == user.username) ? username : undefined,
-                existing_phone: (phone == user.phone) ? phone : undefined,
+                username_existed: (username == user.username) ? true : false,
+                phone_existed: (phone == user.phone) ? true : false,
             });
         }
         bcrypt.hash(password, saltRounds, (err, hashedPwd) => {
@@ -335,7 +334,6 @@ class userController {
                 });
             })
             .catch(err => {
-                console.log(err);
                 res.status(500).json({ message: `Error when findOne in DB`, error: err.message});
             });
     }
@@ -447,17 +445,13 @@ class userController {
             })
     }
 
-    // [GET]] /user/protected-route
-    /*renderProtectedRoute(req, res, next) {
-        res.send('<br><br><br><center><h1>Chào mừng bạn đến với Tiro!</h1></center>');
-    }*/
-
     // [GET] /user/logout
     logout(req, res, next) {
         res.clearCookie('session-token');
         res.redirect('/');
     }
 
+    // [GET] /user/get
     getUserData(req, res, next) {
         const user = req.user;
         if (user) {
