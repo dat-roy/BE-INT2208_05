@@ -10,5 +10,6 @@ router.get('/new-post', checkSession, postController.renderCreateNewPost);
 router.post('/new-post', checkSession, postController.createNewPost);
 router.get('/my-posts', checkSession, postController.getMyPosts);
 router.post('/search', postController.searchPosts);
+router.get('/get/:id', postController.getPost);
 
 module.exports = router;

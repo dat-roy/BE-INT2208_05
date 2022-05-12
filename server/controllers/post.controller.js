@@ -63,23 +63,23 @@ class postController {
     // [GET] /post/my-posts
     getMyPosts(req, res, next) {
         PostModel.find({ author: req.user._id })
-        .then(posts => {
-            if (posts.length == 0) {
-                return res.status(200).json({
-                    message: 'There is no post',
-                });
-            }
-            res.status(200).json({
-                message: 'Fetch all posts successfully',
-                posts_list: posts,
+            .then(posts => {
+                if (posts.length == 0) {
+                    return res.status(200).json({
+                        message: 'There is no post',
+                    });
+                }
+                res.status(200).json({
+                    message: 'Fetch all posts successfully',
+                    posts_list: posts,
+                })
             })
-        })
-        .catch(err => {
-            res.status(404).json({
-                message: 'Author not found',
-                error: err.message,
-            });
-        })
+            .catch(err => {
+                res.status(404).json({
+                    message: 'Author not found',
+                    error: err.message,
+                });
+            })
     }
 
     // [POST] /post/search
@@ -143,6 +143,24 @@ class postController {
                     error: err.message
                 })
             })
+    }
+
+    // [GET] /post/get/:id
+    getPost(req, res, next) {
+        const _id = req.params.id;
+        PostModel.findById(_id) 
+            .then(post => { 
+                res.status(200).json({
+                    message: 'Fetch a post successfully',
+                    post: post
+                })
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: 'Error when get a post by id',
+                    error: err.message
+                })
+            });
     }
 }
 
