@@ -4,6 +4,8 @@ const userController = require('../controllers/user.controller.js');
 let checkSession = require('../middlewares/check-session.js');
 let upload = require('../middlewares/upload-image');
 
+const saved_image_folder = 'avatar';
+const upload_image_field = "file";
 //=========================//
 
 //Views
@@ -23,7 +25,7 @@ router.post('/auth/login', userController.verifyLogin);
 router.post('/auth/google-login', userController.verifyGoogleLogin);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password/:id/:token', userController.resetPassword);
-router.post('/settings', checkSession, upload('avatar').single('avatar'), userController.saveUserSettings);
+router.post('/update', checkSession, upload(saved_image_folder).single(upload_image_field), userController.saveUserSettings);
 router.get('/logout', userController.logout);
 router.get('/get', checkSession, userController.getUserData);
 

@@ -93,7 +93,7 @@ class userController {
                     });
                     userRecord.save()
                         .then(user => {
-                            res.status(200).json({ 
+                            res.status(200).json({
                                 message: `Saved a new user`,
                                 user_data: user,
                             });
@@ -229,7 +229,6 @@ class userController {
     async verifyGoogleLogin(req, res, next) {
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
         const google_token = req.body.credential;
-
         try {
             const ticket = await client.verifyIdToken({
                 idToken: google_token,
@@ -238,16 +237,19 @@ class userController {
             const payload = ticket.getPayload();
             const email = payload.email;
             const existingUser = await UserModel.findOne({ email: email });
+
             if (existingUser) {
+                let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
+                res.cookie('session-token', token);
+
                 if (existingUser.username && existingUser.phone && existingUser.password) {
-                    let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
-                    res.cookie('session-token', token);
                     res.status(200).json({
                         is_correct: true,
-                        enough_data: true, 
+                        enough_data: true,
                         account_status: AccountStatus.EXISTENT_ACCOUNT,
                         message: 'Login successfully!',
-                        user_data: existingUser
+                        user_data: existingUser,
+                        token: token
                     });
                 } else {
                     res.status(200).json({
@@ -255,7 +257,8 @@ class userController {
                         enough_data: false,
                         account_status: AccountStatus.EXISTENT_ACCOUNT,
                         message: 'Have not yet completed user data',
-                        user_data: existingUser
+                        user_data: existingUser,
+                        token: token
                     });
                 }
             } else {
@@ -272,12 +275,15 @@ class userController {
                 });
                 userRecord.save()
                     .then((user) => {
+                        let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
+                        res.cookie('session-token', token);
                         res.status(200).json({
                             is_correct: true,
                             enough_data: false,
                             account_status: AccountStatus.NEW_ACCOUNT,
                             message: 'Create new account successfully!',
-                            user_data: user
+                            user_data: user,
+                            token: token
                         });
                     })
                     .catch(err => {
@@ -287,7 +293,8 @@ class userController {
                             enough_data: false,
                             account_status: undefined,
                             message: 'Error when saving user information to DB: ' + err.message,
-                            user_data: undefined
+                            user_data: undefined,
+                            token: undefined
                         });
                     });
             }
@@ -309,7 +316,7 @@ class userController {
         UserModel.findOne({ email: req.body.email })
             .then(user => {
                 if (!user) {
-                    return res.status(404).json({message: `User not found`});
+                    return res.status(404).json({ message: `User not found` });
                 }
                 const payload = { email: user.email };
                 let token = jwt.sign(payload, JWTPrivateKey + user.password, { expiresIn: '15m' });
@@ -327,14 +334,14 @@ class userController {
 
                 transporter.sendMail(info, (err, data) => {
                     if (err) {
-                        res.status(500).json({message: `Error when sending an email`, error: err.message});
+                        res.status(500).json({ message: `Error when sending an email`, error: err.message });
                     } else {
-                        res.status(200).json({message: `Password reset link has been sent to user email`});
+                        res.status(200).json({ message: `Password reset link has been sent to user email` });
                     }
                 });
             })
             .catch(err => {
-                res.status(500).json({ message: `Error when findOne in DB`, error: err.message});
+                res.status(500).json({ message: `Error when findOne in DB`, error: err.message });
             });
     }
 
@@ -358,20 +365,20 @@ class userController {
 
     // [POST] /user/reset-password/:id/:token
     resetPassword(req, res, next) {
-        const {id} = req.params;
+        const { id } = req.params;
         UserModel.findOne({ _id: id })
             .then(user => {
-                if (!user) return res.status(404).json({message: 'Invalid user id'});
+                if (!user) return res.status(404).json({ message: 'Invalid user id' });
                 const { password, confirm_password } = req.body;
-                
+
                 jwt.verify(req.params.token, JWTPrivateKey + user.password, (err) => {
-                    if (err) return res.status(401).json({message: 'Invalid or expired token'});
-                    
+                    if (err) return res.status(401).json({ message: 'Invalid or expired token' });
+
                     bcrypt.hash(password, saltRounds, (err, hashedPwd) => {
-                        if (err) return res.json({message: `Error when hash password with bcrypt: ${err}`});
-                        UserModel.findOneAndUpdate({ _id: id}, {password: hashedPwd})
+                        if (err) return res.json({ message: `Error when hash password with bcrypt: ${err}` });
+                        UserModel.findOneAndUpdate({ _id: id }, { password: hashedPwd })
                             .then(user => {
-                                res.status(200).json({ 
+                                res.status(200).json({
                                     message: `Update new password successfully`,
                                 });
                             })
@@ -404,44 +411,50 @@ class userController {
         res.render('user-settings', { user });
     }*/
 
-    // [POST] /user/settings
+    // [POST] /user/update
     saveUserSettings(req, res, next) {
-        const { _id, picture } = req.user;
-        const { username, family_name, given_name, gender, phone } = req.body;
-        let filename;
-        if (!picture.image_url && picture.name) {
+        console.log(req.file);
+        return;
+        const user = req.user;
+        const { _id, picture } = user;
+        const {
+            username, password,
+            given_name, gender, phone, role } = req.body;
+
+        let filename = undefined;
+        console.log("Hello");
+        // if (!picture.image_url && picture.name) {
             const oldFilePath = path.join(__dirname, '..', 'public', 'upload', 'avatar', picture.name);
             if (req.file) {
                 if (fs.existsSync(oldFilePath)) {
                     unlink(oldFilePath, err => {
                         if (err) {
-                            res.status(500).json({message: `Error when deleting an existed image`, error: err.message});
+                            res.status(500).json({ message: `Error when deleting an existed image`, error: err.message });
                         }
                     });
                 }
                 filename = req.file.filename;
-            } else {
-                filename = picture.name;
             }
-        }
+        // }
 
         UserModel.findByIdAndUpdate(_id, {
-            username: username,
+            username: username || user.username,
+            password: password || user.password,
             picture: {
-                name: filename,
-                image_url: false,
+                name: filename || user.picture.name,
+                image_url: !(filename),
             },
-            family_name: family_name,
-            given_name: given_name,
-            gender: gender,
-            phone: phone,
+            given_name: given_name || user.given_name,
+            gender: gender || user.gender,
+            phone: phone || user.phone,
+            role: role || user.role
         })
             .then(user => {
                 //res.redirect(`/user/profile`);
-                res.status(200).json({message: `Change user settings successfully`});
+                res.status(200).json({ message: `Change user settings successfully` });
             })
             .catch(err => {
-                res.status(500).json({message: `Error when saving user settings to DB`, error: err.message});
+                res.status(500).json({ message: `Error when saving user settings to DB`, error: err.message });
             })
     }
 
