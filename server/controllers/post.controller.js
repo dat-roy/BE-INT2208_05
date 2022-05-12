@@ -86,19 +86,63 @@ class postController {
     searchPosts(req, res, next) {
         
         /*Request form data: 
-        /// NOTE: null value here means 'accepting all options'
+        /// NOTE: undefined here means 'accepting all options'.
         {
-            room_type: String {null by default, ... }
-            gender: String, {null by default, 'male', 'female'}
-            area: String, {null by default, ...}
+            room_type: String {undefined by default, ... }
+            gender: String, {undefined by default, 'male', 'female'}
+            min_room_area: Number, {undefined by default, ...}
+            max_room_area: Number, {undefined by default, ...}
             capacity: Number, {1 by default, 2, 3, ...}
-            min_price: Number, {null by default}
-            max_price: Number, {null by default}
+            min_price: Number, {undefined by default}
+            max_price: Number, {undefined by default}
         }
         */
+        const { room_type, gender, min_room_area, max_room_area, capacity, min_price, max_price } = req.body;
 
+        let filter_map = new Map();
+        if (room_type) {
+            filter_map.set('information.room_type', room_type);
+        }
+        if (gender) {
+            filter_map.set('information.gender', gender);
+        }
+        if (min_room_area && max_room_area) {
+            filter_map.set('information.room_area', 
+                { $gte: min_room_area, $lte: max_room_area }
+            );
+        }
+        if (capacity) {
+            filter_map.set('information.capacity', capacity);
+        }
+        if (min_price && max_price) {
+            filter_map.set('information.expenses.rental_price', 
+                { $gte: min_price, $lte: max_price }
+            );
+        }
         
-
+        const filter = Object.fromEntries(filter_map);
+        //console.log(filter);
+        
+        PostModel.find(filter)
+            .then(posts => {
+                if (! posts) {
+                    res.status(404).json({
+                        message: 'No result found'
+                    })
+                } else {
+                    res.status(200).json({
+                        message: 'Search results:',
+                        total_posts: posts.length,
+                        posts: posts
+                    });
+                }
+            }) 
+            .catch(err => {
+                res.status(500).json({
+                    message: 'Error when searching posts',
+                    error: err.message
+                })
+            })
     }
 }
 
