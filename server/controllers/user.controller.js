@@ -186,11 +186,11 @@ class userController {
     */
 
     // [GET] /user/login
-    /*
+    
     login(req, res, next) {
         res.render('login', { client_id: GOOGLE_CLIENT_ID });
     }
-    */
+    
 
     // [POST] /user/auth/login
     /*
@@ -250,8 +250,11 @@ class userController {
             if (existingUser) {
                 let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
                 res.cookie('session-token', token);
+                if (!existingUser.picture.image_url) {
+                    existingUser.picture.name = `/upload/avatar/${existingUser.picture.name}`;
+                }
 
-                if (existingUser.username && existingUser.phone && existingUser.password) {
+                if (existingUser.username && existingUser.phone /*&& existingUser.password*/) {
                     res.status(200).json({
                         is_correct: true,
                         enough_data: true,
@@ -286,6 +289,9 @@ class userController {
                     .then((user) => {
                         let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
                         res.cookie('session-token', token);
+                        if (!user.picture.image_url) {
+                            user.picture.name = `/upload/avatar/${user.picture.name}`;
+                        }
                         res.status(200).json({
                             is_correct: true,
                             enough_data: false,
@@ -428,15 +434,13 @@ class userController {
     saveUserSettings(req, res, next) {
         const user = req.user;
         const { _id, picture } = user;
-        const {
-            username, password,
-            given_name, gender, phone, role } = req.body;
+        const { username, password, given_name, gender, phone, role } = req.body;
         console.log(username, password,
             given_name, gender, phone, role);
 
         let filename = undefined;
 
-        const oldFilePath = path.join(__dirname, '..', 'public', 'upload', 'avatar', picture.name);
+        const oldFilePath = path.join(__dirname, '..', 'public', picture.name);
         if (req.file) {
             if (fs.existsSync(oldFilePath)) {
                 unlink(oldFilePath, err => {

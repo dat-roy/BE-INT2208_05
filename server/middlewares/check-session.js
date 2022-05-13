@@ -4,7 +4,7 @@ const JWTPrivateKey = process.env.JWT_PRIVATE_KEY;
 
 function checkSession(req, res, next) {
     let token = req.cookies['session-token'];
-    console.log(req.cookies);
+    console.log(token);
     try {
         //Default algorithm: HMAC SHA256
         const payload = jwt.verify(token, JWTPrivateKey);
@@ -16,9 +16,10 @@ function checkSession(req, res, next) {
                 if (!user.email_verified) {
                     return res.status(403).json({ message: 'Your account has not been activated.' });
                 }
-
-                //TODO: Fix this
-                req.user= user;
+                if (!user.picture.image_url) {
+                    user.picture.name = `/upload/avatar/${user.picture.name}`;
+                }
+                req.user = user;
                 next();
             })
     } catch (err) {

@@ -10,7 +10,7 @@ const upload_image_field = "file";
 
 //Views
 //router.get('/register', userController.register);
-//router.get('/login', userController.login);
+router.get('/login', userController.login);
 //router.get('/forgot-password', userController.viewForgotPassword);
 //router.get('/profile', checkSession, userController.renderProfile);
 //router.get('/settings', checkSession, userController.renderUserSettings);
