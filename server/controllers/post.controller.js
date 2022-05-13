@@ -71,7 +71,7 @@ class postController {
                 }
                 res.status(200).json({
                     message: 'Fetch all posts successfully',
-                    posts_list: posts,
+                    posts: posts,
                 })
             })
             .catch(err => {
@@ -146,22 +146,52 @@ class postController {
     }
 
     // [GET] /post/get/:id
-    getPost(req, res, next) {
+    getPostById(req, res, next) {
         const _id = req.params.id;
         PostModel.findById(_id) 
             .then(post => { 
-                res.status(200).json({
-                    message: 'Fetch a post successfully',
-                    post: post
-                })
+                if (! post) {
+                    res.status(404).json({
+                        message: 'Can not find this post',
+                    })
+                } else {
+                    res.status(200).json({
+                        message: 'Fetch a post successfully',
+                        post: post
+                    })
+                }
             })
             .catch(err => {
                 res.status(500).json({
-                    message: 'Error when get a post by id',
+                    message: 'Error when getting a post by id',
                     error: err.message
                 })
             });
     }
+
+    // [GET] /post/get-all
+    getAllPosts(req, res, next) {
+        PostModel.find({})
+            .then(posts => {
+                if (! posts) {
+                    res.status(404).json({
+                        message: 'There is no post'
+                    })
+                } else {
+                    res.status(200).json({
+                        message: 'Fetch all posts successfully',
+                        posts: posts
+                    })
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: 'Error when getting all posts',
+                    error: err.message
+                })
+            })
+    }
+
 }
 
 module.exports = new postController();
