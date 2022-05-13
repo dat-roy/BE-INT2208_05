@@ -40,8 +40,8 @@ const JWTPrivateKey = process.env.JWT_PRIVATE_KEY;
 class userController {
 
     // [POST] /user/register
+    /*
     async submitRegister(req, res, next) {
-
         const { username, email, phone, password } = req.body;
 
         //Check existing username & email & phone in DB:
@@ -108,8 +108,10 @@ class userController {
             });
         })
     }
+    */
 
     // [POST] /user/register-with-google
+    /*
     async submitRegisterWithGoogle(req, res, next) {
         const { username, email, phone, password } = req.body;
 
@@ -147,8 +149,10 @@ class userController {
                 });
         });
     }
+    */
 
     // [GET] /user/activate-account/:token
+    /*
     activateAccount(req, res, next) {
         const { token } = req.params;
         jwt.verify(token, JWTPrivateKey, (err, payload) => {
@@ -179,13 +183,17 @@ class userController {
                 })
         });
     }
+    */
 
     // [GET] /user/login
+    /*
     login(req, res, next) {
         res.render('login', { client_id: GOOGLE_CLIENT_ID });
     }
+    */
 
     // [POST] /user/auth/login
+    /*
     verifyLogin(req, res, next) {
         let account = req.body.account;
         let password = req.body.password;
@@ -224,6 +232,7 @@ class userController {
                 })
             })
     }
+    */
 
     // [POST] /user/auth/google-login
     async verifyGoogleLogin(req, res, next) {
@@ -311,6 +320,7 @@ class userController {
     }
 
     // [POST] /user/forgot-password
+    /*
     forgotPassword(req, res, next) {
 
         UserModel.findOne({ email: req.body.email })
@@ -344,6 +354,7 @@ class userController {
                 res.status(500).json({ message: `Error when findOne in DB`, error: err.message });
             });
     }
+    */
 
     // [GET] /user/reset-password/:id/:token
     /*viewResetPassword(req, res, next) {
@@ -364,6 +375,7 @@ class userController {
     }*/
 
     // [POST] /user/reset-password/:id/:token
+    /*
     resetPassword(req, res, next) {
         const { id } = req.params;
         UserModel.findOne({ _id: id })
@@ -398,6 +410,7 @@ class userController {
                 });
             })
     }
+    */
 
     // [GET] /user/profile
     /*renderProfile(req, res, next) {
