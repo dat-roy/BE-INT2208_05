@@ -61,7 +61,7 @@ class userController {
                     error: err.message
                 });
             }
-            //Email verification:
+            //Email verification:`
             const payload = {
                 email: email,
             };
@@ -141,7 +141,7 @@ class userController {
                 })
                 .catch(err => {
                     res.status(500).json({
-                        message: `Error when saving user infomation to DB`,
+                        message: `Error when saving user information to DB`,
                         error: err.message
                     });
                 });
@@ -413,36 +413,36 @@ class userController {
 
     // [POST] /user/update
     saveUserSettings(req, res, next) {
-        console.log(req.file);
-        return;
         const user = req.user;
         const { _id, picture } = user;
         const {
             username, password,
             given_name, gender, phone, role } = req.body;
+        console.log(username, password,
+            given_name, gender, phone, role);
 
         let filename = undefined;
-        console.log("Hello");
-        // if (!picture.image_url && picture.name) {
-            const oldFilePath = path.join(__dirname, '..', 'public', 'upload', 'avatar', picture.name);
-            if (req.file) {
-                if (fs.existsSync(oldFilePath)) {
-                    unlink(oldFilePath, err => {
-                        if (err) {
-                            res.status(500).json({ message: `Error when deleting an existed image`, error: err.message });
-                        }
-                    });
-                }
-                filename = req.file.filename;
+
+        const oldFilePath = path.join(__dirname, '..', 'public', 'upload', 'avatar', picture.name);
+        if (req.file) {
+            if (fs.existsSync(oldFilePath)) {
+                unlink(oldFilePath, err => {
+                    if (err) {
+                        res.status(500).json({ message: `Error when deleting an existed image`, error: err.message });
+                    }
+                });
             }
-        // }
+            filename = req.file.filename;
+        }
+
+        console.log(username || user.username);
 
         UserModel.findByIdAndUpdate(_id, {
             username: username || user.username,
             password: password || user.password,
             picture: {
                 name: filename || user.picture.name,
-                image_url: !(filename),
+                image_url: !filename,
             },
             given_name: given_name || user.given_name,
             gender: gender || user.gender,
