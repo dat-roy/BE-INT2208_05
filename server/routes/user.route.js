@@ -22,11 +22,11 @@ router.get('/login', userController.login);
 //router.post('/register-with-google', userController.submitRegisterWithGoogle);
 //router.get('/activate-account/:token', userController.activateAccount);
 //router.post('/auth/login', userController.verifyLogin);
-router.post('/auth/google-login', userController.verifyGoogleLogin);
 //router.post('/forgot-password', userController.forgotPassword);
 //router.post('/reset-password/:id/:token', userController.resetPassword);
-router.post('/update', checkSession, upload(saved_image_folder).single(upload_image_field), userController.saveUserSettings);
+router.post('/auth/google-login', userController.verifyGoogleLogin);
 router.get('/logout', userController.logout);
 router.get('/get', checkSession, userController.getUserData);
+router.post('/update', checkSession, upload(saved_image_folder).single(upload_image_field), userController.updateSettings);
 
 module.exports = router;

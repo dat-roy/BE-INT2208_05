@@ -431,12 +431,12 @@ class userController {
     }*/
 
     // [POST] /user/update
-    saveUserSettings(req, res, next) {
+    updateSettings(req, res, next) {
         const user = req.user;
         const { _id, picture } = user;
         const { username, password, given_name, gender, phone, role } = req.body;
-        console.log(username, password,
-            given_name, gender, phone, role);
+        /*console.log(username, password,
+            given_name, gender, phone, role);*/
 
         let filename = undefined;
 
@@ -452,11 +452,11 @@ class userController {
             filename = req.file.filename;
         }
 
-        console.log(username || user.username);
+        //console.log(username || user.username);
 
         UserModel.findByIdAndUpdate(_id, {
             username: username || user.username,
-            password: password || user.password,
+            //password: password || user.password,
             picture: {
                 name: filename || user.picture.name,
                 image_url: !filename,
@@ -467,7 +467,6 @@ class userController {
             role: role || user.role
         })
             .then(user => {
-                //res.redirect(`/user/profile`);
                 res.status(200).json({ message: `Change user settings successfully` });
             })
             .catch(err => {
