@@ -11,7 +11,7 @@ dotenv.config();
 const backendHostName = process.env.BACKEND_HOST;
 const frontendHostName = process.env.FRONTEND_HOST;
 const FE_PORT = process.env.FE_PORT;
-const BE_PORT = process.env.BE_PORT;
+const BE_PORT = process.env.BE_PORT || 80;
 
 const corsOptions = {
     origin: `http://${frontendHostName}:${FE_PORT}`,
