@@ -11,7 +11,7 @@ dotenv.config();
 const backendHostName = process.env.BACKEND_HOST;
 const frontendHostName = process.env.FRONTEND_HOST;
 const FE_PORT = process.env.FE_PORT;
-const BE_PORT = process.env.BE_PORT || 80;
+const BE_PORT = process.env.BE_PORT;
 
 const corsOptions = {
     origin: `http://${frontendHostName}:${FE_PORT}`,
@@ -45,6 +45,6 @@ app.set('views', path.join(__dirname, 'views'));
 //Routes init
 initRoutes(app);
 
-app.listen(BE_PORT, backendHostName, () => {
+app.listen(BE_PORT, () => {
     console.log(`Running on port ${BE_PORT}`);
 })
