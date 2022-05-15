@@ -90,7 +90,7 @@ class postController {
             });
     }
 
-    // [GET] /post/get-all
+    // [GET] /post/get/all
     getAllPosts(req, res, next) {
         PostModel.find({})
             .then(posts => {
@@ -113,11 +113,14 @@ class postController {
             })
     }
 
-    // [POST] /post/new-post
+    //TODO: add uploading images
+    // [POST] /post/new
     createNewPost(req, res, next) {
-        const {
-            _id,                    
-            room_type, capacity, gender, room_area, 
+        const {                    
+            room_type, 
+            capacity, 
+            gender, 
+            room_area, 
             rental_price,
             deposit,
             electricity_cost,
@@ -134,11 +137,8 @@ class postController {
             utils_list,
             phone_number,
             title_of_post,
-            room_description,
-            open_time,
-            closing_time,
-            is_verified, 
-        } = req.user;
+            room_description, 
+        } = req.body;
         const postRecord = new PostModel({
             author: req.user._id,
             information: {
@@ -171,22 +171,21 @@ class postController {
                 phone_number: phone_number,
                 title_of_post: title_of_post,
                 room_description: room_description,
-                open_time: open_time,
-                closing_time: closing_time,
             },
-            is_verified: is_verified,
         });
         postRecord.save()
-            .then(post => {
-                res.status(200).json({
-                    message: 'Create new post successfully',
-                });
-            }) 
-            .catch(err => {
-                res.status(500).json({
-                    message: 'Error when saving new post',
-                    error: err.message,
-                });
+            .then((post) => {
+                if (post) {
+                    res.status(200).json({
+                        message: 'Create new post successfully',
+                        post_id: post._id,
+                    });
+                } else {
+                    res.status(500).json({
+                        message: 'Error when saving new post',
+                        error: err.message,
+                    });
+                }
             })
     }
 
@@ -201,7 +200,7 @@ class postController {
                     });
                 }
                 res.status(200).json({
-                    message: 'Fetch all posts successfully',
+                    message: 'Fetch all my posts successfully',
                     posts: posts,
                 })
             })
@@ -213,6 +212,79 @@ class postController {
             })
     }
 
+    //TODO: add findByIdAndUpdate
+    // [GET] /post/edit/:id
+    async editPost(req, res, next) {
+        const post_id = req.params.id;
+        const post = await PostModel.findById(post_id);
+        if (! post) {
+            return res.status(404).json({
+                message: "Invalid post id",
+            })
+        } 
+        if (post.author != user._id) {
+            return res.status(403).json({
+                message: "Access is denied",
+            })
+        } 
+        //PostModel.findByIdAndUpdate(post.author, {})
+    }
+
+    // [GET] /post/soft-delete/:id
+    async softDeletePost(req, res, next) {
+        const post_id = req.params.id;
+        const post = await PostModel.findById(post_id);
+        if (! post) {
+            return res.status(404).json({
+                message: "Invalid post id",
+            })
+        } 
+        if (post.author != user._id) {
+            return res.status(403).json({
+                message: "Access is denied",
+            })
+        } 
+        PostModel.findByIdAndUpdate(post.author, {soft_delete: true}, (err, docs) => {
+            if (err) {
+                res.status(500).json({
+                    message: "Error when soft delete a post",
+                    error: err.message,
+                })
+            } else {
+                res.status(200).json({
+                    message: "Soft delete a post successfully",
+                })
+            }
+        })
+    }
+
+    // [GET] /post/hard-delete/:id
+    async hardDeletePost(req, res, next) {
+        const post_id = req.params.id;
+        const post = await PostModel.findById(post_id);
+        if (! post) {
+            return res.status(404).json({
+                message: "Invalid post id",
+            })
+        } 
+        if (post.author != user._id) {
+            return res.status(403).json({
+                message: "Access is denied",
+            })
+        } 
+        PostModel.findByIdAndDelete(post.author, (err, docs) => {
+            if (err) {
+                res.status(500).json({
+                    message: "Error when hard delete a post",
+                    error: err.message,
+                })
+            } else {
+                res.status(200).json({
+                    message: "Hard delete a post successfully",
+                })
+            }
+        })
+    }
 }
 
 module.exports = new postController();
