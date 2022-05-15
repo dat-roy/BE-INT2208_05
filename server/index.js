@@ -14,7 +14,7 @@ const FE_PORT = process.env.FE_PORT;
 const BE_PORT = process.env.PORT || 3030;
 
 const corsOptions = {
-    origin: `http://${frontendHostName}:${FE_PORT}`,
+    origin: `https://${frontendHostName}:${FE_PORT}`,
     credentials: true,            //access-control-allow-credentials:true
     optionSuccessStatus: 200
 }
