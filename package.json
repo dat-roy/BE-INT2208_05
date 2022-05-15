@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "mongoose-slug-generator": "^1.0.4",
     "nodemon": "^2.0.15"
   },
   "dependencies": {
@@ -24,6 +23,7 @@
     "googleapis": "^97.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.9",
+    "mongoose-slug-generator": "^1.0.4",
     "multer": "^1.4.4",
     "nodemailer": "^6.7.3"
   }
