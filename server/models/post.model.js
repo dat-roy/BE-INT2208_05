@@ -36,8 +36,6 @@ const ConfirmSchema = new Schema({
     phone_number: {type: String, default: ''},
     title_of_post: {type: String, default: ''},
     room_description: {type: String, default: ''},
-    open_time: {type: String, default: ''},
-    closing_time: {type: String, default: ''},
 })
 const PostSchema = new Schema(
     {
@@ -47,6 +45,7 @@ const PostSchema = new Schema(
         utilities: UtilSchema, 
         confirmation: ConfirmSchema,
         is_verified: {type: Boolean, default: false},
+        soft_delete: {type: Boolean, default: false},
     },
     {
         timestamps: true,
