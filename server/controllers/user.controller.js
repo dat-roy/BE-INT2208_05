@@ -121,6 +121,28 @@ class userController {
         }
     }
 
+    // [GET] /user/logout
+    logout(req, res, next) {
+        res.clearCookie('session-token');
+        res.redirect('/');
+    }
+
+    // [GET] /user/get
+    getUserData(req, res, next) {
+        const user = req.user;
+        if (user) {
+            res.status(200).json({
+                message: 'Get user data successfully',
+                user_data: user
+            });
+        } else {
+            res.status(404).json({
+                message: 'Something wrong',
+                user_data: null
+            })
+        }
+    }
+
     // [POST] /user/update
     updateSettings(req, res, next) {
         const user = req.user;
@@ -163,28 +185,6 @@ class userController {
                     error: err.message 
                 });
             })
-    }
-
-    // [GET] /user/logout
-    logout(req, res, next) {
-        res.clearCookie('session-token');
-        res.redirect('/');
-    }
-
-    // [GET] /user/get
-    getUserData(req, res, next) {
-        const user = req.user;
-        if (user) {
-            res.status(200).json({
-                message: 'Get user data successfully',
-                user_data: user
-            });
-        } else {
-            res.status(404).json({
-                message: 'Something wrong',
-                user_data: null
-            })
-        }
     }
 }
 

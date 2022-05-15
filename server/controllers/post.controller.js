@@ -3,106 +3,6 @@ const UserModel = require('../models/user.model.js');
 
 class postController {
 
-    // [POST] /post/new-post
-    createNewPost(req, res, next) {
-        const {
-            _id,                    
-            room_type, capacity, gender, room_area, 
-            rental_price,
-            deposit,
-            electricity_cost,
-            water_cost,
-            internet_cost,
-            has_parking_space,
-            parking_cost,
-            city,
-            district,
-            ward, 
-            street,
-            house_number,
-            filename_list,
-            utils_list,
-            phone_number,
-            title_of_post,
-            room_description,
-            open_time,
-            closing_time,
-            is_verified, 
-        } = req.user;
-        const postRecord = new PostModel({
-            author: req.user._id,
-            information: {
-                room_type: room_type,
-                capacity: capacity,
-                gender: gender,
-                room_area: room_area,
-                expenses: {
-                    rental_price: rental_price,
-                    deposit: deposit,
-                    electricity_cost: electricity_cost,
-                    water_cost: water_cost,
-                    internet_cost: internet_cost,
-                },
-                has_parking_space: has_parking_space, 
-                parking_cost: parking_cost,
-            },
-            address: {
-                city: city,
-                district: district,
-                ward: ward,
-                street: street,
-                house_number: house_number,
-            },
-            utilities: {
-                //images: [filename_list],
-                utils: [utils_list],
-            },
-            confirmation: {
-                phone_number: phone_number,
-                title_of_post: title_of_post,
-                room_description: room_description,
-                open_time: open_time,
-                closing_time: closing_time,
-            },
-            is_verified: is_verified,
-        });
-        postRecord.save()
-            .then(post => {
-                res.status(200).json({
-                    message: 'Create new post successfully',
-                });
-            }) 
-            .catch(err => {
-                res.status(500).json({
-                    message: 'Error when saving new post',
-                    error: err.message,
-                });
-            })
-    }
-
-    // [GET] /post/my-posts
-    getMyPosts(req, res, next) {
-        PostModel.find({ author: req.user._id })
-            .then(posts => {
-                if (posts.length == 0) {
-                    return res.status(200).json({
-                        message: 'There is no post',
-                        posts: null
-                    });
-                }
-                res.status(200).json({
-                    message: 'Fetch all posts successfully',
-                    posts: posts,
-                })
-            })
-            .catch(err => {
-                res.status(404).json({
-                    message: 'Author not found',
-                    error: err.message,
-                });
-            })
-    }
-
     // [POST] /post/search
     searchPosts(req, res, next) {
         
@@ -210,6 +110,106 @@ class postController {
                     message: 'Error when getting all posts',
                     error: err.message
                 })
+            })
+    }
+
+    // [POST] /post/new-post
+    createNewPost(req, res, next) {
+        const {
+            _id,                    
+            room_type, capacity, gender, room_area, 
+            rental_price,
+            deposit,
+            electricity_cost,
+            water_cost,
+            internet_cost,
+            has_parking_space,
+            parking_cost,
+            city,
+            district,
+            ward, 
+            street,
+            house_number,
+            filename_list,
+            utils_list,
+            phone_number,
+            title_of_post,
+            room_description,
+            open_time,
+            closing_time,
+            is_verified, 
+        } = req.user;
+        const postRecord = new PostModel({
+            author: req.user._id,
+            information: {
+                room_type: room_type,
+                capacity: capacity,
+                gender: gender,
+                room_area: room_area,
+                expenses: {
+                    rental_price: rental_price,
+                    deposit: deposit,
+                    electricity_cost: electricity_cost,
+                    water_cost: water_cost,
+                    internet_cost: internet_cost,
+                },
+                has_parking_space: has_parking_space, 
+                parking_cost: parking_cost,
+            },
+            address: {
+                city: city,
+                district: district,
+                ward: ward,
+                street: street,
+                house_number: house_number,
+            },
+            utilities: {
+                //images: [filename_list],
+                utils: [utils_list],
+            },
+            confirmation: {
+                phone_number: phone_number,
+                title_of_post: title_of_post,
+                room_description: room_description,
+                open_time: open_time,
+                closing_time: closing_time,
+            },
+            is_verified: is_verified,
+        });
+        postRecord.save()
+            .then(post => {
+                res.status(200).json({
+                    message: 'Create new post successfully',
+                });
+            }) 
+            .catch(err => {
+                res.status(500).json({
+                    message: 'Error when saving new post',
+                    error: err.message,
+                });
+            })
+    }
+
+    // [GET] /post/my-posts
+    getMyPosts(req, res, next) {
+        PostModel.find({ author: req.user._id })
+            .then(posts => {
+                if (posts.length == 0) {
+                    return res.status(200).json({
+                        message: 'There is no post',
+                        posts: null
+                    });
+                }
+                res.status(200).json({
+                    message: 'Fetch all posts successfully',
+                    posts: posts,
+                })
+            })
+            .catch(err => {
+                res.status(404).json({
+                    message: 'Author not found',
+                    error: err.message,
+                });
             })
     }
 
