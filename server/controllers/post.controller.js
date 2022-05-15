@@ -2,49 +2,69 @@ const PostModel = require('../models/post.model.js');
 const UserModel = require('../models/user.model.js');
 
 class postController {
-    // [GET] /post/new-post
-    renderCreateNewPost(req, res, next) {
-        res.render('create-new-post');
-    }
 
     // [POST] /post/new-post
     createNewPost(req, res, next) {
+        const {
+            _id,                    
+            room_type, capacity, gender, room_area, 
+            rental_price,
+            deposit,
+            electricity_cost,
+            water_cost,
+            internet_cost,
+            has_parking_space,
+            parking_cost,
+            city,
+            district,
+            ward, 
+            street,
+            house_number,
+            filename_list,
+            utils_list,
+            phone_number,
+            title_of_post,
+            room_description,
+            open_time,
+            closing_time,
+            is_verified, 
+        } = req.user;
         const postRecord = new PostModel({
             author: req.user._id,
             information: {
-                room_type: req.body.room_type,
-                capacity: req.body.capacity,
-                gender: req.body.gender,
-                room_area: req.body.room_area,
+                room_type: room_type,
+                capacity: capacity,
+                gender: gender,
+                room_area: room_area,
                 expenses: {
-                    rental_price: req.body.rental_price,
-                    deposit: req.body.deposit,
-                    electricity_cost: req.body.electricity_cost,
-                    water_cost: req.body.water_cost,
-                    internet_cost: req.body.internet_cost,
+                    rental_price: rental_price,
+                    deposit: deposit,
+                    electricity_cost: electricity_cost,
+                    water_cost: water_cost,
+                    internet_cost: internet_cost,
                 },
-                has_parking_space: req.body.has_parking_space, 
-                parking_cost: req.body.parking_cost,
+                has_parking_space: has_parking_space, 
+                parking_cost: parking_cost,
             },
             address: {
-                city: req.body.city,
-                district: req.body.district,
-                ward: req.body.ward,
-                street: req.body.street,
-                house_number: req.body.house_number,
+                city: city,
+                district: district,
+                ward: ward,
+                street: street,
+                house_number: house_number,
             },
             utilities: {
-                //images: [req.file.filename],
-                utils: [req.body.utils],
+                //images: [filename_list],
+                utils: [utils_list],
             },
             confirmation: {
-                phone_number: req.body.phone_number,
-                title_of_post: req.body.title_of_post,
-                room_description: req.body.room_description,
-                open_time: req.body.open_time,
-                closing_time: req.body.closing_time,
+                phone_number: phone_number,
+                title_of_post: title_of_post,
+                room_description: room_description,
+                open_time: open_time,
+                closing_time: closing_time,
             },
-            is_verified: req.body.is_verified,
+            is_verified: is_verified,
         });
         postRecord.save()
             .then(post => {
@@ -67,6 +87,7 @@ class postController {
                 if (posts.length == 0) {
                     return res.status(200).json({
                         message: 'There is no post',
+                        posts: null
                     });
                 }
                 res.status(200).json({

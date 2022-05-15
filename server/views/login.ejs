@@ -8,28 +8,9 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Đăng nhập vào Tiro</h1>
-    <form action="/user/auth/login" method="POST">
-        <p class="account">Email / SĐT</p>
-        <input type="text" name="account" id="account"> 
-        <p class="password">Mật khẩu</p>
-        <input type="text" name="password" id="password">
-        <br/><br/>
-        <button type="submit" value="submit">Đăng nhập</button>
-    </form>
-    <br/>
-
-    <br/>
     <div class="g_id_signout">
         <a href="/user/logout" id="signout_button">Sign out</a>        
     </div>
-
-    <br/>
-    <a href="/user/register">Tạo tài khoản</a>
-    <br/><br/>
-    <a href="/user/forgot-password">Quên mật khẩu</a>
-    <br/>
-
     <h2>Đăng nhập bằng Google</h2>
     <div id="g_id_onload"
         data-client_id="<%=client_id%>"
@@ -47,13 +28,5 @@
         data-size="large"
         data-locale="vi">
     </div>
-    <script>
-        const button = document.getElementById("signout_button");
-        button.onclick = () => {
-            google.accounts.id.disableAutoSelect();
-        }
-    </script>
-    
-
 </body>
 </html>
