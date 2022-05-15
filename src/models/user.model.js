@@ -1,3 +1,4 @@
+const { type } = require('express/lib/response');
 const mongoose = require('mongoose');
 const slug = require('mongoose-slug-generator');
 mongoose.plugin(slug);
@@ -24,6 +25,7 @@ const UserSchema = new Schema(
         timestamps: true,
     },
 )
+
 
 // Export a model
 // Modal name = Collection name (in plural & lowercase form)

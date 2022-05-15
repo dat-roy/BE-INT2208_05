@@ -12,7 +12,7 @@ router.get('/login', userController.login);
 router.get('/forgot-password', userController.viewForgotPassword);
 router.get('/profile', checkSession, userController.renderProfile);
 router.get('/settings', checkSession, userController.renderUserSettings);
-router.get('/protected-route', checkSession, userController.renderProtectedRoute);      
+router.get('/protected-route', checkSession, userController.renderProtectedRoute);    
 
 router.post('/register', userController.submitRegister);
 router.post('/register-with-google', userController.submitRegisterWithGoogle);
