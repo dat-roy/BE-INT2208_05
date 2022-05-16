@@ -1,35 +1,45 @@
-export const RoleOptions = Object.freeze({
+const RoleOptions = Object.freeze({
     RENTER: 'RENTER',
     LANDLORD: 'LANDLORD',
     ADMIN: 'ADMIN',
 });
 
-export const GenderOptions = Object.freeze({
+const GenderOptions = Object.freeze({
     MALE: 'MALE',
     FEMALE: 'FEMALE',
     OTHER: 'OTHER',
     ALL: 'ALL',
 });
 
-export const ColorOptions = Object.freeze({
+const ColorOptions = Object.freeze({
 
 });
 
-export const PostStatus = Object.freeze({
+const PostStatus = Object.freeze({
     REJECTED: -1,
     PENDING: 0,
     APPROVED: 1,
 });
 
-export const RoomTypes = Object.freeze({
+const RoomTypes = Object.freeze({
 
 });
 
-export const UtilitiesOptions = Object.freeze({
+const UtilitiesOptions = Object.freeze({
 
 });
 
-export const AccountStatus = Object.freeze({
+const AccountStatus = Object.freeze({
     NEW_ACCOUNT: 'NEW_ACCOUNT',
     EXISTENT_ACCOUNT: 'EXISTENT_ACCOUNT',
 });
+
+module.exports = {
+    RoleOptions, 
+    GenderOptions,
+    ColorOptions,
+    PostStatus,
+    RoomTypes,
+    UtilitiesOptions,
+    AccountStatus,
+}
