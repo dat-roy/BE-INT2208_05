@@ -1,3 +1,4 @@
+const { GenderOptions } = require('../types/customed-types.js');
 const mongoose = require('mongoose');
 const slug = require('mongoose-slug-generator');
 mongoose.plugin(slug);
@@ -5,19 +6,19 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema(
     {
-        username: { type: String, default: '', unique: true },
-        given_name: { type: String, default: '' },
-        family_name: { type: String, default: '' },
-        email: { type: String, default: '', unique: true },
-        phone: { type: String, default: '' },
+        username: { type: String, default: undefined, unique: true },
+        given_name: { type: String, default: null },
+        family_name: { type: String, default: null },
+        email: { type: String, default: null, unique: true },
+        phone: { type: String, default: null },
         picture: { 
-            name: {type: String, default: '',},
-            image_url: {type: Boolean, default: 'false'},
+            name: {type: String, default: null,},
+            image_url: {type: Boolean, default: true},
         },
-        role: {type: String, default: ''},
-        gender: {type: String, default: 'other'},
-        address: {type: String, default: ''},
-        theme: {type: String, default: ''},
+        role: {type: String, default: undefined},
+        gender: {type: String, default: GenderOptions.OTHER},
+        address: {type: String, default: null},
+        theme: {type: String, default: null},
         slug: { type: String, slug: 'email', unique: true },
     },
     {
