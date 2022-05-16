@@ -4,6 +4,7 @@ const JWTPrivateKey = process.env.JWT_PRIVATE_KEY;
 
 function checkSession(req, res, next) {
     let token = req.cookies['session-token'];
+    console.log('In check-session middleware: ', token);
     try {
         //Default algorithm: HMAC SHA256
         const payload = jwt.verify(token, JWTPrivateKey);

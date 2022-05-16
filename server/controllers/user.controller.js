@@ -109,6 +109,7 @@ class userController {
             console.log(err);
             res.status(500).json({
                 is_correct: false,
+                enough_data: undefined,
                 account_status: undefined,
                 message: 'Error when verifying Google account: ' + err.message,
                 user_data: undefined
@@ -119,7 +120,9 @@ class userController {
     // [GET] /user/logout
     logout(req, res, next) {
         res.clearCookie('session-token');
-        res.redirect('/');
+        res.status(200).json({
+            message: 'Logout successfully',
+        })
     }
 
     // [GET] /user/get
@@ -151,7 +154,10 @@ class userController {
             if (fs.existsSync(oldFilePath)) {
                 unlink(oldFilePath, err => {
                     if (err) {
-                        res.status(500).json({ message: `Error when deleting an existed image`, error: err.message });
+                        res.status(500).json({ 
+                            message: `Error when deleting an existed image`, 
+                            error: err.message 
+                        });
                     }
                 });
             }
@@ -171,7 +177,8 @@ class userController {
         })
             .then(user => {
                 res.status(200).json({ 
-                    message: `Change user settings successfully` 
+                    message: `Change user settings successfully`,
+                    error: null,
                 });
             })
             .catch(err => {
