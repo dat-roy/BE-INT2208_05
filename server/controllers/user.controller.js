@@ -145,7 +145,7 @@ class userController {
     updateSettings(req, res, next) {
         const user = req.user;
         const { _id, picture } = user;
-        const { username, given_name, gender, phone, role } = req.body;
+        const { username, given_name, family_name, gender, phone, role } = req.body;
 
         let filename = undefined;
 
@@ -171,6 +171,7 @@ class userController {
                 image_url: !filename,
             },
             given_name: given_name || user.given_name,
+            family_name: family_name || user.family_name,
             gender: gender || user.gender,
             phone: phone || user.phone,
             role: role || user.role
