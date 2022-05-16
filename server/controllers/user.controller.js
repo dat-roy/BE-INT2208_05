@@ -1,4 +1,5 @@
 const UserModel = require('../models/user.model.js');
+const { AccountStatus } = require('../types/customed-types.js');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -6,12 +7,6 @@ const fs = require('fs');
 const { unlink } = require('fs');
 const dotenv = require('dotenv');
 dotenv.config();
-
-const AccountStatus = Object.freeze({
-    NEW_ACCOUNT: "NEW_ACCOUNT",
-    EXISTENT_ACCOUNT: "EXISTENT_ACCOUNT",
-});
-
 
 // Google Auth
 const { OAuth2Client } = require('google-auth-library');
