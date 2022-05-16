@@ -10,11 +10,11 @@ dotenv.config();
 //Get hostname & port
 const backendHostName = process.env.BACKEND_HOST;
 const frontendHostName = process.env.FRONTEND_HOST;
-const FE_PORT = process.env.FE_PORT;
+const FE_PORT = process.env.FE_PORT || 3000;
 const BE_PORT = process.env.PORT || 3030;
 
 const corsOptions = {
-    origin: `https://${frontendHostName}`,
+    origin: `${frontendHostName}`,
     credentials: true,            //access-control-allow-credentials:true
     optionSuccessStatus: 200
 }
