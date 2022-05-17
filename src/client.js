@@ -21,7 +21,7 @@ async function sendMessage(){
 }
 socket.on('newmsg', function(data){
    if(user_id){
-      document.getElementById('message-container').innerHTML +='<div><b>' + data.user + '</b>: ' + data.message + '</div>'
+      document.getElementById('message-container').innerHTML +='<div><b>' + data.user + '</b> : ' + data.message + ' (new) </div>'
    }
 })
 
