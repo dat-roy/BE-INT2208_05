@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>My posts</h1>
+    <% for(const post of postList) { %>   
+        <p>Post id: <%= post._id %></p>
+        <b>Title: <%= post.title%> </b>
+        <p>Address: <%= post.address %></p>
+        <p>Author: <%= post.author.username %></p>
+        <img src="/upload/avatar/<%=post.author.picture%>" alt="" style= "width: 100px; height: auto; border-radius: 30%;">
+        <p>
+            Verified: <% if(post.is_verified) {%> <b style = "color: blue">True</b> <%} else {%> <b style = "color: red">False</b> <%}%>
+        </p>
+        <p> ---------------- </p>
+    <% } %>
+    
+</body>
+</html>

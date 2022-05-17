@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>Document</title>
+</head>
+<body>
+    <h1>Đăng ký bằng Google</h1>
+    <form action="/user/register-with-google" method="POST">
+        <p class="username">Username</p>
+        <input type="text" name="username" id="username" required>
+        <p class="email">Email</p>
+        <input type="text" name="email" id="email" value="<%=email%>" readonly> 
+        <p class="phone">SĐT</p>
+        <input type="text" name="phone" id="phone" required>
+        <p class="password">Mật khẩu</p>
+        <input type="text" name="password" id="password" required>
+        <p class="password">Nhập lại mật khẩu</p>
+        <input type="text" name="confirm_password" id="confirm_password" required>
+        <br/><br/>
+        <button type="submit" value="submit">Đăng ký</button>
+    </form>
+    <br/>
+
+</body>
+</html>

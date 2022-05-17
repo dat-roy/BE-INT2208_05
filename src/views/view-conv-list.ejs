@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <% for (const res of result) {%>
+        <p><%=res.username%></p>
+        <a href="/chat/box/<%=res.partner_id%>">View chat box</a>
+        <p>Last message: <%=res.last_msg.message%></p>
+    <%}%>
+</body>
+</html>
