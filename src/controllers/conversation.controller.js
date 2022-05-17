@@ -188,7 +188,7 @@ class ConversationController {
                             ]
                         }
                     ]
-                }, (err, res) => {
+                }, (err, result) => {
                     //console.log(res); 
                     res.json(conv);
                 })
