@@ -4,11 +4,8 @@ const router = express.Router();
 const conversationController = require('../controllers/conversation.controller');
 const checkSession = require('../middlewares/check-session.js');
 
-router.get('/conversation', checkSession, conversationController.renderConversation);
-router.get('/inside-chat-box', checkSession, conversationController.insideChatBox);
+router.get('/all', checkSession, conversationController.viewAllConversations);
 router.get('/box/:id', checkSession, conversationController.chatBox);
-router.get('/', checkSession, conversationController.searchUser);
-router.post('/', checkSession, conversationController.searchUserResult);
-
+router.get('/', checkSession, conversationController.viewChatMenu);
 
 module.exports = router;

@@ -7,10 +7,17 @@
     <title>Document</title>
 </head>
 <body>
+    <h1>All my conversations: </h1>
     <% for (const res of result) {%>
-        <p><%=res.username%></p>
-        <a href="/chat/box/<%=res.partner_id%>">View chat box</a>
+        <p>Username: <b><%=res.username%></b></p>
+        <img src="<%=res.avatar%>" alt="Avatar" style="border-radius: 50%;">
+        <br>
         <p>Last message: <%=res.last_msg.message%></p>
+        <form action="/chat/box/<%=res.partner_id%>" method="get">
+            <button type="submit">View chat box</button>
+        </form>
+        <p>--------</p>
+        <br><br>
     <%}%>
 </body>
 </html>

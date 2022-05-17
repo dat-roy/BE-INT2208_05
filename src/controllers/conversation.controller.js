@@ -5,75 +5,8 @@ const UserModel = require('../models/user.model');
 
 class ConversationController {
     
-    //[Gvet] /chat
-    searchUser(req, res, next) {
-        res.render('search-user');
-    }
-    //[POST] /chat
-    searchUserResult(req, res, next) {
-        const search_name = req.body.search_user;
-        const sender = req.user;
-        const user_id_1 = req.user._id;
-    
-        UserModel.findOne({  username: search_name })
-            .then(user => {
-                const receiver = user;
-                const user_id_2 = user._id;
-                ConversationModel.findOne(
-                    {
-                        $or: [
-                            {
-                                "member.userID_1": user_id_1,
-                                "member.userID_2": user_id_2,
-                            },
-                            {
-                                "member.userID_1": user_id_2,
-                                "member.userID_2": user_id_1,
-                            },
-                        ]
-                    }
-                ).then(conversation => {
-                    if (conversation) {
-                        res.render('chat-box', {
-                            conversation: conversation,
-                            sender: sender,
-                            receiver: receiver,
-                        });
-                    }
-                     else {
-                         console.log('khong tim thay hoi thoai');
-                         const conversationRecord = new ConversationModel({
-                             conversation_id: Object._id,
-                             member: {
-                                 userID_1: user_id_1,
-                                 userID_2: user_id_2,
-                             },
-                             total_messages: 0
-                         });
-                         conversationRecord.save()
-                         .then((result) =>{
-                             res.render('chat-box', {
-                                 conversation: result,
-                                 sender: sender,
-                                 receiver: receiver,
-                             });
-                         })
-                         .catch(err =>{
-                             console.log(err);
-                         })
-                     }
-                })
-                
-            })
-            .catch(err => {
-                console.log('khong tim thay tai khoan: ', err.message);
-            })
-
-    }
-
-
-    //[GET]/chat/conversation
-    renderConversation(req, res) {
+    //[GET] /chat
+    viewChatMenu(req, res, next) {
         const user = req.user;
         ConversationModel.find({
             $or: [
@@ -90,21 +23,157 @@ class ConversationController {
                         if (! msg.sender.equals(user._id)) {
                             if (! msg.receiver_seen) {
                                 count_new_message++;
-                                //console.log(count_new_message);
                             }
                         }
                     }
                 }   
-                res.render('view-conv', {count_new_message});
+                res.render('chat-menu', {count_new_message});
             })
             .catch((err) => {
                 res.json({error: err});
             })
     }
+    //[GET] /chat/box/:id
+    chatBox(req, res, next) {
+    
+        let sender = req.user;
+        let receiver = undefined;
 
-    //[GET] /chat/inside-chat-box
-    insideChatBox(req, res, next) {
-        //Tim tat ca cac hoi thoai cua user
+        //// Check if the partner exists or not: ////
+        UserModel.findById(req.params.id)
+            .then(partner => {
+                if (! partner) {
+                    return res.status(404).json({
+                        message: "Invalid partner id.",
+                        sender: sender,
+                        receiver: undefined,
+                    })
+                }
+                receiver = partner;
+                
+                //// Find a conversation between the two users: ////
+                ConversationModel.findOne(
+                    {
+                        $or: [
+                            {
+                                "member.userID_1": sender._id,
+                                "member.userID_2": receiver._id,
+                            },
+                            {
+                                "member.userID_1": receiver._id,
+                                "member.userID_2": sender._id,
+                            },
+                        ]
+                    }
+                ).then(conv => {
+                    if (conv) {
+                        console.log(conv);
+                        //// Update seen status ////
+                        ConversationModel.updateMany({
+                            _id: conv._id,
+                        }, {
+                            $set: {
+                                "messages.$[msg].receiver_seen": true,
+                            }
+                        }, {
+                            arrayFilters: [
+                                {
+                                    $and: [
+                                        {"msg.sender": partner._id},
+                                        {"msg.receiver_seen": false},
+                                    ]
+                                }
+                            ]
+                        }, (err, result) => {
+                            //console.log(res); 
+                            //res.json(conv);
+                            res.render('chat-box', {
+                                conversation: conv,
+                                sender: sender,
+                                receiver: receiver,
+                            });
+                        })
+                    }
+                     else {
+                         //console.log('Khong tim thay hoi thoai');
+
+                         //// Create a new conversation ////
+                         const convRecord = new ConversationModel({
+                             conversation_id: Object._id,
+                             member: {
+                                 userID_1: sender._id,
+                                 userID_2: receiver._id,
+                             },
+                             total_messages: 0
+                         });
+                         convRecord.save()
+                            .then((result) =>{
+                                res.render('chat-box', {
+                                    conversation: result,
+                                    sender: sender,
+                                    receiver: receiver,
+                                });
+                            })
+                            .catch(err =>{
+                                console.log(err);
+                            })
+                     }
+                })
+                
+            })
+            .catch(err => {
+                console.log('khong tim thay tai khoan: ', err.message);
+            })
+
+    }
+
+    // //[GET] /chat/box/:id
+    // chatBox(req, res, next) {
+    //     const user_id = req.user._id;
+    //     const partner_id = req.params.id;
+
+    //     console.log(user_id);
+    //     console.log(partner_id);
+
+    //     ConversationModel.findOne({
+    //         $or: [
+    //             {
+    //                 "member.userID_1": user_id,
+    //                 "member.userID_2": partner_id,
+    //             },
+    //             {
+    //                 "member.userID_1": partner_id,
+    //                 "member.userID_2": user_id,
+    //             },
+    //         ]
+    //     })
+    //         .then(conv => {
+    //             ConversationModel.updateMany({
+    //                 _id: conv._id,
+    //             }, {
+    //                 $set: {
+    //                     "messages.$[msg].receiver_seen": true,
+    //                 }
+    //             }, {
+    //                 arrayFilters: [
+    //                     {
+    //                         $and: [
+    //                             {"msg.sender": partner_id},
+    //                             {"msg.receiver_seen": false},
+    //                         ]
+    //                     }
+    //                 ]
+    //             }, (err, result) => {
+    //                 //console.log(res); 
+    //                 res.json(conv);
+    //             })
+               
+    //         })
+    // }
+
+    //View all conversations related to the user
+    //[GET] /chat/all
+    viewAllConversations(req, res, next) {
         const user = req.user;
         ConversationModel.find({
             $or: [
@@ -120,11 +189,13 @@ class ConversationController {
                     let partner_id;
                     let username;
                     let avatar;
+
                     if (user._id.equals(conv.member.userID_1)) {
                         partner_id = conv.member.userID_2;
                     } else {
                         partner_id = conv.member.userID_1;
                     }
+
                     const partner = await UserModel.findById(partner_id);
                     if (partner) {
                         username = partner.username;
@@ -132,13 +203,14 @@ class ConversationController {
                     } else {
                         res.json({error: "User not found"});
                     }
+
                     let last_msg = conv.messages[conv.messages.length - 1];
 
                     result.push({
                         partner_id,
                         username,
                         avatar,
-                        last_msg
+                        last_msg,
                     });
                 }
                 //console.log(result);
@@ -149,50 +221,6 @@ class ConversationController {
             })
             .catch((err) => {
                 res.json({error: err});
-            })
-    }
-
-    //[GET] /chat/box/:id
-    chatBox(req, res, next) {
-        const user_id = req.user._id;
-        const partner_id = req.params.id;
-
-        console.log(user_id);
-        console.log(partner_id);
-
-        ConversationModel.findOne({
-            $or: [
-                {
-                    "member.userID_1": user_id,
-                    "member.userID_2": partner_id,
-                },
-                {
-                    "member.userID_1": partner_id,
-                    "member.userID_2": user_id,
-                },
-            ]
-        })
-            .then(conv => {
-                ConversationModel.updateMany({
-                    _id: conv._id,
-                }, {
-                    $set: {
-                        "messages.$[msg].receiver_seen": true,
-                    }
-                }, {
-                    arrayFilters: [
-                        {
-                            $and: [
-                                {"msg.sender": partner_id},
-                                {"msg.receiver_seen": false},
-                            ]
-                        }
-                    ]
-                }, (err, result) => {
-                    //console.log(res); 
-                    res.json(conv);
-                })
-               
             })
     }
 }

@@ -9,12 +9,25 @@
     <script src="../client.js" async></script>
 </head>
 <body onload="initConversation('<%=sender._id%>', '<%=conversation._id%>', '<%=sender.username%>') ">
-    <h1 id="name" aria-valuetext="<%=sender._id%>"><%=sender.username%> to </h1>
+    <h1 id="name" aria-valuetext="<%=sender._id%>"><%=sender.username%></h1>
+        &
       <h1 id="receiverName" aria-valuetext="<%=receiver.username%>"><%=receiver.username%></h1>
-      <h1 id="room" aria-valuetext="<%=conversation._id%>"><%=conversation._id%></h1>
+      <h2 id="room" aria-valuetext="<%=conversation._id%>">Room id: <%=conversation._id%></h2>
       <input type="text" id="message">
       <button type="button" name="button" onclick="sendMessage()" >Send</button>
-      <div id="message-container"></div>
-      <div id="message-container"></div>
+      <div id="message-container">
+        <% for (const conv of conversation.messages) {%>
+            <div>
+                <b><%if (conv.sender == sender._id) {%> 
+                        <%=sender.username%>
+                    <%} else {%>
+                        <%=receiver.username%>
+                    <%}%>
+                </b>: 
+                <%=conv.message%>
+            </div>
+        <%}%>
+        
+      </div>
 </body>
 </html>
