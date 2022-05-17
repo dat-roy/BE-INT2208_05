@@ -8,7 +8,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="../client.js" async></script>
 </head>
-<body onload="initConversation('<%=sender._id%>', '<%=conversation._id%>')">
+<body onload="initConversation('<%=sender._id%>', '<%=conversation._id%>', '<%=sender.username%>') ">
     <h1 id="name" aria-valuetext="<%=sender._id%>"><%=sender.username%> to </h1>
       <h1 id="receiverName" aria-valuetext="<%=receiver.username%>"><%=receiver.username%></h1>
       <h1 id="room" aria-valuetext="<%=conversation._id%>"><%=conversation._id%></h1>

@@ -71,6 +71,8 @@ class ConversationController {
 
     }
 
+
+    //[GET]/chat/conversation
     renderConversation(req, res) {
         const user = req.user;
         ConversationModel.find({
@@ -83,9 +85,12 @@ class ConversationController {
                 let count_new_message = 0;
                 for (const conv of conv_list) {
                     for (const msg of conv.messages) {
-                        if (msg.sender != user._id) {
+                        
+                        //Note: use equals to compare two ObjectId in MongoDB
+                        if (! msg.sender.equals(user._id)) {
                             if (! msg.receiver_seen) {
                                 count_new_message++;
+                                console.log(count_new_message);
                             }
                         }
                     }
@@ -96,6 +101,8 @@ class ConversationController {
                 res.json({error: err});
             })
     }
+
+    //[GET] /chat/inside-chat-box
     insideChatBox(req, res, next) {
         //Tim tat ca cac hoi thoai cua user
         const user = req.user;

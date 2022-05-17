@@ -45,20 +45,18 @@ initRoutes(app);
 
 
 const ConversationModel = require('./models/conversation.model');
-let roomNumber;
+const { join } = require('path');
 
 io.on('connection', function(socket){
-   socket.on('setRoom', function(data) {
-      roomNumber = data;
-      socket.join(roomNumber);
+   socket.on('setRoom', function(room_id) {
+      socket.join(room_id);
    });
-   console.log('A user connected ' + roomNumber);
    socket.on('msg', function(data){
-      io.sockets.in(roomNumber).emit('newmsg', data);
+      io.in(data.room_id).emit('newmsg', data);
       const room_id = data.room_id;
-      const sender_id = data.user;
+      const sender_id = data.userId;
       const message = data.message;
-      console.log("Room id & Sender_id & message: ", room_id, sender_id, message);
+   
       ConversationModel.findByIdAndUpdate(room_id, {
          $push: {
             messages: {
@@ -73,7 +71,7 @@ io.on('connection', function(socket){
       .catch((err) => {
          console.log("Error when saving a new msg: ", err.message);
       })
-     
+      
    })
 });
 
