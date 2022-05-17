@@ -67,109 +67,68 @@ class ConversationController {
                     }
                 ).then(conv => {
                     if (conv) {
-                        console.log(conv);
                         //// Update seen status ////
-                        ConversationModel.updateMany({
-                            _id: conv._id,
-                        }, {
-                            $set: {
-                                "messages.$[msg].receiver_seen": true,
-                            }
-                        }, {
-                            arrayFilters: [
-                                {
-                                    $and: [
-                                        {"msg.sender": partner._id},
-                                        {"msg.receiver_seen": false},
-                                    ]
-                                }
-                            ]
-                        }, (err, result) => {
-                            //console.log(res); 
-                            //res.json(conv);
-                            res.render('chat-box', {
-                                conversation: conv,
-                                sender: sender,
-                                receiver: receiver,
-                            });
-                        })
+                        updateSeenStatus(conv, partner);
                     }
                      else {
-                         //console.log('Khong tim thay hoi thoai');
-
-                         //// Create a new conversation ////
-                         const convRecord = new ConversationModel({
-                             conversation_id: Object._id,
-                             member: {
-                                 userID_1: sender._id,
-                                 userID_2: receiver._id,
-                             },
-                             total_messages: 0
-                         });
-                         convRecord.save()
-                            .then((result) =>{
-                                res.render('chat-box', {
-                                    conversation: result,
-                                    sender: sender,
-                                    receiver: receiver,
-                                });
-                            })
-                            .catch(err =>{
-                                console.log(err);
-                            })
+                        //// Create a new conversation ////
+                        createANewConversation();
                      }
                 })
                 
             })
             .catch(err => {
-                console.log('khong tim thay tai khoan: ', err.message);
+                res.status(500).json({
+                    message: 'Error when finding user id',
+                    error: err.message,
+                })
+            });
+        
+        function updateSeenStatus(conv, partner) {
+            ConversationModel.updateMany({
+                _id: conv._id,
+            }, {
+                $set: {
+                    "messages.$[msg].receiver_seen": true,
+                }
+            }, {
+                arrayFilters: [
+                    {
+                        $and: [
+                            {"msg.sender": partner._id},
+                            {"msg.receiver_seen": false},
+                        ]
+                    }
+                ]
+            }, (err, result) => {
+                res.render('chat-box', {
+                    conversation: conv,
+                    sender: sender,
+                    receiver: receiver,
+                });
             })
+        }
 
+        function createANewConversation() {
+            const convRecord = new ConversationModel({
+                member: {
+                    userID_1: sender._id,
+                    userID_2: receiver._id,
+                }
+            });
+            convRecord.save()
+               .then((result) =>{
+                   res.render('chat-box', {
+                       conversation: result,
+                       sender: sender,
+                       receiver: receiver,
+                   });
+               })
+               .catch(err =>{
+                   console.log(err);
+               })
+        }
     }
-
-    // //[GET] /chat/box/:id
-    // chatBox(req, res, next) {
-    //     const user_id = req.user._id;
-    //     const partner_id = req.params.id;
-
-    //     console.log(user_id);
-    //     console.log(partner_id);
-
-    //     ConversationModel.findOne({
-    //         $or: [
-    //             {
-    //                 "member.userID_1": user_id,
-    //                 "member.userID_2": partner_id,
-    //             },
-    //             {
-    //                 "member.userID_1": partner_id,
-    //                 "member.userID_2": user_id,
-    //             },
-    //         ]
-    //     })
-    //         .then(conv => {
-    //             ConversationModel.updateMany({
-    //                 _id: conv._id,
-    //             }, {
-    //                 $set: {
-    //                     "messages.$[msg].receiver_seen": true,
-    //                 }
-    //             }, {
-    //                 arrayFilters: [
-    //                     {
-    //                         $and: [
-    //                             {"msg.sender": partner_id},
-    //                             {"msg.receiver_seen": false},
-    //                         ]
-    //                     }
-    //                 ]
-    //             }, (err, result) => {
-    //                 //console.log(res); 
-    //                 res.json(conv);
-    //             })
-               
-    //         })
-    // }
 
     //View all conversations related to the user
     //[GET] /chat/all
@@ -213,8 +172,6 @@ class ConversationController {
                         last_msg,
                     });
                 }
-                //console.log(result);
-                //res.send(result);
                 res.render('view-conv-list', {
                     result: result,
                 })
