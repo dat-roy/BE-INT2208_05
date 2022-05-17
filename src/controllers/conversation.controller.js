@@ -90,7 +90,7 @@ class ConversationController {
                         if (! msg.sender.equals(user._id)) {
                             if (! msg.receiver_seen) {
                                 count_new_message++;
-                                console.log(count_new_message);
+                                //console.log(count_new_message);
                             }
                         }
                     }
@@ -120,7 +120,7 @@ class ConversationController {
                     let partner_id;
                     let username;
                     let avatar;
-                    if (user._id == conv.member.userID_1) {
+                    if (user._id.equals(conv.member.userID_1)) {
                         partner_id = conv.member.userID_2;
                     } else {
                         partner_id = conv.member.userID_1;
@@ -141,14 +141,60 @@ class ConversationController {
                         last_msg
                     });
                 }
-                console.log(result);
-                res.send(result);
+                //console.log(result);
+                //res.send(result);
+                res.render('view-conv-list', {
+                    result: result,
+                })
             })
             .catch((err) => {
                 res.json({error: err});
             })
     }
 
+    //[GET] /chat/box/:id
+    chatBox(req, res, next) {
+        const user_id = req.user._id;
+        const partner_id = req.params.id;
+
+        console.log(user_id);
+        console.log(partner_id);
+
+        ConversationModel.findOne({
+            $or: [
+                {
+                    "member.userID_1": user_id,
+                    "member.userID_2": partner_id,
+                },
+                {
+                    "member.userID_1": partner_id,
+                    "member.userID_2": user_id,
+                },
+            ]
+        })
+            .then(conv => {
+                ConversationModel.updateMany({
+                    _id: conv._id,
+                }, {
+                    $set: {
+                        "messages.$[msg].receiver_seen": true,
+                    }
+                }, {
+                    arrayFilters: [
+                        {
+                            $and: [
+                                {"msg.sender": partner_id},
+                                {"msg.receiver_seen": false},
+                            ]
+                        }
+                    ]
+                }, (err, res) => {
+                    //console.log(res); 
+                    res.json(conv);
+                })
+               
+            })
+    }
 }
 
-module.exports = new ConversationController();  
+module.exports = new ConversationController(); 
