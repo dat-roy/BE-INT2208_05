@@ -1,14 +1,14 @@
 const RoleOptions = Object.freeze({
-    RENTER: 'RENTER',
-    LANDLORD: 'LANDLORD',
-    ADMIN: 'ADMIN',
+    RENTER: 'renter',
+    LANDLORD: 'landlord',
+    ADMIN: 'admin',
 });
 
 const GenderOptions = Object.freeze({
-    MALE: 'MALE',
-    FEMALE: 'FEMALE',
-    OTHER: 'OTHER',
-    ALL: 'ALL',
+    MALE: 'male',
+    FEMALE: 'female',
+    OTHER: 'other',
+    ALL: 'all',
 });
 
 const ColorOptions = Object.freeze({

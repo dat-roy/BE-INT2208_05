@@ -10,7 +10,7 @@ class postController {
         /// NOTE: undefined here means 'accepting all options'.
         {
             room_type: String {undefined by default, ... }
-            gender: String, {undefined by default, 'male', 'female'}
+            gender: String, {'all' by default, 'male', 'female'}
             min_room_area: Number, {undefined by default, ...}
             max_room_area: Number, {undefined by default, ...}
             capacity: Number, {1 by default, 2, 3, ...}
@@ -48,19 +48,25 @@ class postController {
             .then(posts => {
                 if (! posts) {
                     res.status(404).json({
-                        message: 'No result found'
+                        message: 'No result found',
+                        count_posts: 0,
+                        posts: null,
+                        error: null,
                     })
                 } else {
                     res.status(200).json({
                         message: 'Search results:',
-                        total_posts: posts.length,
-                        posts: posts
+                        count_posts: posts.length,
+                        posts: posts,
+                        error: null,
                     });
                 }
             }) 
             .catch(err => {
                 res.status(500).json({
                     message: 'Error when searching posts',
+                    count_posts: 0,
+                    posts: null,
                     error: err.message
                 })
             })
@@ -74,17 +80,21 @@ class postController {
                 if (! post) {
                     res.status(404).json({
                         message: 'Can not find this post',
+                        post: null,
+                        error: null,
                     })
                 } else {
                     res.status(200).json({
                         message: 'Fetch a post successfully',
-                        post: post
+                        post: post,
+                        error: null,
                     })
                 }
             })
             .catch(err => {
                 res.status(500).json({
                     message: 'Error when getting a post by id',
+                    post: null,
                     error: err.message
                 })
             });
