@@ -5,7 +5,6 @@ mongoose.plugin(slug);
 const { Schema } = mongoose;
 
 const ConversationSchema = new Schema({
-    conversation_id: { type: mongoose.ObjectId },
     member: {
         userID_1: {type: mongoose.ObjectId},
         userID_2: {type: mongoose.ObjectId}
