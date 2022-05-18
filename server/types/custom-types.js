@@ -12,7 +12,9 @@ const GenderOptions = Object.freeze({
 });
 
 const ColorOptions = Object.freeze({
-
+    BLUE: 'blue',
+    RED: 'red',
+    ORANGE: 'orange',
 });
 
 const PostStatus = Object.freeze({
@@ -22,7 +24,11 @@ const PostStatus = Object.freeze({
 });
 
 const RoomTypes = Object.freeze({
-
+    DORMITORY: 'dormitory',
+    HOUSE: 'house',
+    APARTMENT: 'apartment',
+    ROOM_FOR_RENT: 'room_for_rent',
+    ROOM_FOR_SHARE: 'room_for_share',
 });
 
 const UtilitiesOptions = Object.freeze({

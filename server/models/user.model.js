@@ -1,4 +1,4 @@
-const { GenderOptions } = require('../types/customed-types.js');
+const { GenderOptions } = require('../types/custom-types.js');
 const mongoose = require('mongoose');
 const slug = require('mongoose-slug-generator');
 mongoose.plugin(slug);

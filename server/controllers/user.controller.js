@@ -1,5 +1,5 @@
 const UserModel = require('../models/user.model.js');
-const { AccountStatus } = require('../types/customed-types.js');
+const { AccountStatus } = require('../types/custom-types.js');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
