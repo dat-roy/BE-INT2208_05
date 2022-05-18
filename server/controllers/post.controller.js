@@ -100,25 +100,29 @@ class postController {
             });
     }
 
-    // [GET] /post/get/all
+    // [GET] /post/get-all
     getAllPosts(req, res, next) {
         PostModel.find({})
             .then(posts => {
                 if (! posts) {
                     res.status(404).json({
-                        message: 'There is no post'
+                        message: 'There is no post',
+                        posts: null,
+                        error: null,
                     })
                 } else {
                     res.status(200).json({
                         message: 'Fetch all posts successfully',
-                        posts: posts
+                        posts: posts,
+                        error: null, 
                     })
                 }
             })
             .catch(err => {
                 res.status(500).json({
                     message: 'Error when getting all posts',
-                    error: err.message
+                    posts: null,
+                    error: err.message,
                 })
             })
     }
@@ -189,10 +193,12 @@ class postController {
                     res.status(200).json({
                         message: 'Create new post successfully',
                         post_id: post._id,
+                        error: null,
                     });
                 } else {
                     res.status(500).json({
                         message: 'Error when saving new post',
+                        post_id: null,
                         error: err.message,
                     });
                 }
@@ -206,17 +212,20 @@ class postController {
                 if (posts.length == 0) {
                     return res.status(200).json({
                         message: 'There is no post',
-                        posts: null
+                        posts: null,
+                        error: null, 
                     });
                 }
                 res.status(200).json({
                     message: 'Fetch all my posts successfully',
                     posts: posts,
+                    error: null,
                 })
             })
             .catch(err => {
                 res.status(404).json({
                     message: 'Author not found',
+                    posts: null,
                     error: err.message,
                 });
             })
@@ -247,11 +256,13 @@ class postController {
         if (! post) {
             return res.status(404).json({
                 message: "Invalid post id",
+                error: null,
             })
         } 
         if (post.author != user._id) {
             return res.status(403).json({
                 message: "Access is denied",
+                error: null,
             })
         } 
         PostModel.findByIdAndUpdate(post.author, {soft_delete: true}, (err, docs) => {
@@ -263,6 +274,7 @@ class postController {
             } else {
                 res.status(200).json({
                     message: "Soft delete a post successfully",
+                    error: null,
                 })
             }
         })
@@ -275,11 +287,13 @@ class postController {
         if (! post) {
             return res.status(404).json({
                 message: "Invalid post id",
+                error: null,
             })
         } 
         if (post.author != user._id) {
             return res.status(403).json({
                 message: "Access is denied",
+                error: null,
             })
         } 
         PostModel.findByIdAndDelete(post.author, (err, docs) => {
@@ -291,6 +305,7 @@ class postController {
             } else {
                 res.status(200).json({
                     message: "Hard delete a post successfully",
+                    error: null,
                 })
             }
         })
