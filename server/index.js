@@ -45,6 +45,42 @@ app.set('views', path.join(__dirname, 'views'));
 //Routes init
 initRoutes(app);
 
-app.listen(BE_PORT, () => {
+const http = require('http');
+const server = http.createServer(app);
+const {Server} = require("socket.io");
+const io = new Server(server);
+
+const ConversationModel = require('./models/conversation.model');
+const { join } = require('path');
+
+io.on('connection', function(socket){
+   socket.on('setRoom', function(room_id) {
+      socket.join(room_id);
+   });
+   socket.on('msg', function(data){
+      io.in(data.room_id).emit('newmsg', data);
+      const room_id = data.room_id;
+      const sender_id = data.userId;
+      const message = data.message;
+   
+      ConversationModel.findByIdAndUpdate(room_id, {
+         $push: {
+            messages: {
+               sender: sender_id, 
+               message: message,
+               sentAt: new Date(),
+            }
+         }
+      }).then(() =>{
+         console.log("Save a new message successfully");
+      })
+      .catch((err) => {
+         console.log("Error when saving a new msg: ", err.message);
+      })
+      
+   })
+});
+
+server.listen(BE_PORT, () => {
     console.log(`Running on port ${BE_PORT}`);
 })
