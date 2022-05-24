@@ -19,6 +19,9 @@ const UserSchema = new Schema(
         gender: {type: String, default: GenderOptions.OTHER},
         address: {type: String, default: null},
         theme: {type: String, default: null},
+        saved_posts: [
+            {type: mongoose.ObjectId, default: undefined},
+        ],
         slug: { type: String, slug: 'email', unique: true },
     },
     {
