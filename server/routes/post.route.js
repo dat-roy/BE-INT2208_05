@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/post.controller.js');
 const checkSession = require('../middlewares/check-session.js');  
+const upload = require('../middlewares/upload-image.js');
 
 const saved_image_folder = 'room-img';
 const upload_image_field = 'file';
