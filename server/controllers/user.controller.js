@@ -40,7 +40,7 @@ class userController {
 
             if (existingUser) {
                 let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
-                res.cookie('session-token', token);
+                //res.cookie('session-token', token);
                 if (!existingUser.picture.image_url) {
                     existingUser.picture.name = `/upload/avatar/${existingUser.picture.name}`;
                 }
@@ -112,7 +112,8 @@ class userController {
                 enough_data: undefined,
                 account_status: undefined,
                 message: 'Error when verifying Google account: ' + err.message,
-                user_data: undefined
+                user_data: undefined,
+                token: undefined,
             });
         }
     }
@@ -125,7 +126,7 @@ class userController {
         })
     }
 
-    // [GET] /user/get-me
+    // [POST] /user/get-me
     getLoggedInUserData(req, res, next) {
         const user = req.user;
         if (user) {
@@ -140,7 +141,6 @@ class userController {
             })
         }
     }
-
 
     // [GET] /user/get/:id
     getUserDataById(req, res, next) {

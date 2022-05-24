@@ -178,8 +178,8 @@ class postController {
                 house_number: house_number,
             },
             utilities: {
-                //images: [filename_list],
-                utils: [utils_list],
+                images: filename_list,
+                utils: utils_list,
             },
             confirmation: {
                 phone_number: phone_number,
@@ -231,23 +231,6 @@ class postController {
             })
     }
 
-    //TODO: add findByIdAndUpdate
-    // [GET] /post/edit/:id
-    async editPost(req, res, next) {
-        const post_id = req.params.id;
-        const post = await PostModel.findById(post_id);
-        if (! post) {
-            return res.status(404).json({
-                message: "Invalid post id",
-            })
-        } 
-        if (post.author != user._id) {
-            return res.status(403).json({
-                message: "Access is denied",
-            })
-        } 
-        //PostModel.findByIdAndUpdate(post.author, {})
-    }
 
     // [GET] /post/soft-delete/:id
     async softDeletePost(req, res, next) {
