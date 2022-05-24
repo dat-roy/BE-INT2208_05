@@ -1,4 +1,4 @@
-const socket = io.connect('http://localhost:3030');
+const socket = io.connect('http://tiro-app.herokuapp.com');
 let user_id;
 let room_id;
 let user_name;

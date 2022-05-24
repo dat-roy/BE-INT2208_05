@@ -7,6 +7,10 @@ const upload = require('../middlewares/upload-image.js');
 const saved_image_folder = 'room-img';
 const upload_image_field = 'file';
 
+//View test
+router.get('/test-new', postController.viewTestNew);
+router.post('/test-new', upload(saved_image_folder).array(upload_image_field), postController.testNew);
+
 //=================================
 router.post('/search', postController.searchPosts);
 router.get('/get/:id', postController.getPostById);

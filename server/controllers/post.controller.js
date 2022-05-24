@@ -4,6 +4,14 @@ const UserModel = require('../models/user.model.js');
 
 class postController {
 
+    viewTestNew(req, res, next) {
+        res.render('upload');
+    }
+
+    testNew(req, res, next) {
+        res.send(req.files);
+    }
+
     // [POST] /post/search
     searchPosts(req, res, next) {
         
