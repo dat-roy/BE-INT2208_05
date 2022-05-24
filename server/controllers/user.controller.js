@@ -125,8 +125,8 @@ class userController {
         })
     }
 
-    // [GET] /user/get
-    getUserData(req, res, next) {
+    // [GET] /user/get-me
+    getLoggedInUserData(req, res, next) {
         const user = req.user;
         if (user) {
             res.status(200).json({
@@ -141,6 +141,35 @@ class userController {
         }
     }
 
+
+    // [GET] /user/get/:id
+    getUserDataById(req, res, next) {
+        const user_id = req.params.id;
+        UserModel.findById(user_id) 
+            .then(user => {
+                if (! user) {
+                    return res.status(404).json({
+                        message: "No user found",
+                        user: null,
+                        error: null,
+                    })
+                }
+                else {
+                    return res.status(200).json({
+                        message: "Get user by id successfully",
+                        user: user, 
+                        error: null,
+                    })
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: "Error from server",
+                    user: null,
+                    error: err.message,
+                })
+            })
+    }
     // [POST] /user/update
     updateSettings(req, res, next) {
         const user = req.user;

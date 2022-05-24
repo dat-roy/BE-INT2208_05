@@ -15,7 +15,8 @@ router.get('/login', userController.login);
 //Server
 router.post('/auth/google-login', userController.verifyGoogleLogin);
 router.get('/logout', userController.logout);
-router.get('/get', checkSession, userController.getUserData);
+router.get('/get-me', checkSession, userController.getLoggedInUserData);
+router.get('/get/:id', userController.getUserDataById);
 router.post('/update', checkSession, upload(saved_image_folder).single(upload_image_field), userController.updateSettings);
 
 module.exports = router;
