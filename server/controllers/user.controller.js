@@ -19,12 +19,6 @@ const JWTPrivateKey = process.env.JWT_PRIVATE_KEY;
 //===========================
 class userController {
 
-    //TODO: remove in last version
-    // [GET] /user/login
-    login(req, res, next) {
-        res.render('login', { client_id: GOOGLE_CLIENT_ID });
-    }
-
     // [POST] /user/auth/google-login
     async verifyGoogleLogin(req, res, next) {
         const client = new OAuth2Client(GOOGLE_CLIENT_ID);
