@@ -110,18 +110,18 @@ class ConversationController {
                         err: err,
                     })
                 }
-                // res.status(200).json({
-                //     link: `http://localhost:3030/client.js`,
-                //     conversation: conv,
-                //     sender: sender,
-                //     receiver: receiver,
-                // })
-                res.render('chat-box', {
+                res.status(200).json({
                     link: `http://localhost:3030/client.js`,
                     conversation: conv,
                     sender: sender,
                     receiver: receiver,
                 })
+                // res.render('chat-box', {
+                //     link: `http://localhost:3030/client.js`,
+                //     conversation: conv,
+                //     sender: sender,
+                //     receiver: receiver,
+                // })
             })
         }
 
