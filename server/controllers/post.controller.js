@@ -1,3 +1,4 @@
+const { file } = require('googleapis/build/src/apis/file');
 const PostModel = require('../models/post.model.js');
 const UserModel = require('../models/user.model.js');
 
@@ -176,6 +177,7 @@ class postController {
 
         const file_list = req.files;
         console.log(file_list);
+        res.status(200).send(file_list);
         /*const postRecord = new PostModel({
             author: req.user._id,
             information: {
