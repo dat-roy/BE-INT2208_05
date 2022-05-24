@@ -173,7 +173,8 @@ class postController {
             title_of_post,
             room_description, 
         } = req.body;
-        const postRecord = new PostModel({
+        console.log(filename_list);
+        /*const postRecord = new PostModel({
             author: req.user._id,
             information: {
                 //room_type: room_type,
@@ -223,7 +224,7 @@ class postController {
                         error: err.message,
                     });
                 }
-            })
+            })*/
     }
 
     // [GET] /post/my-posts
