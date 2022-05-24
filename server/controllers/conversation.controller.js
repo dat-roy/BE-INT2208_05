@@ -110,7 +110,13 @@ class ConversationController {
                         err: err,
                     })
                 }
-                res.status(200).json({
+                // res.status(200).json({
+                //     link: `http://localhost:3030/client.js`,
+                //     conversation: conv,
+                //     sender: sender,
+                //     receiver: receiver,
+                // })
+                res.render('chat-box', {
                     link: `http://localhost:3030/client.js`,
                     conversation: conv,
                     sender: sender,
@@ -165,6 +171,7 @@ class ConversationController {
                     } else {
                         partner_id = conv.member.userID_1;
                     }
+                    console.log(partner_id);
 
                     const partner = await UserModel.findById(partner_id);
                     if (partner) {

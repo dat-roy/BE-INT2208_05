@@ -27,10 +27,21 @@ class postController {
         if (gender) {
             filter_map.set('information.gender', gender);
         }
+        console.log(min_room_area && max_room_area);
         if (min_room_area && max_room_area) {
             filter_map.set('information.room_area', 
                 { $gte: min_room_area, $lte: max_room_area }
             );
+        }
+        else if (min_room_area) {
+            console.log("MIN", min_room_area);
+            filter_map.set('information.room_area', 
+            { $gte: min_room_area }
+            )
+        } else if (max_room_area) {
+            filter_map.set('information.room_area', 
+            { $lte: max_room_area }
+            )
         }
         if (capacity) {
             filter_map.set('information.capacity', capacity);

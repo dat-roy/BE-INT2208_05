@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://localhost:3030/client.js"></script>
+</head>
+<body onload="initConversation('<%=sender._id%>', '<%=conversation._id%>', '<%=sender.username%>') ">
+    <h1 id="name" aria-valuetext="<%=sender._id%>"><%=sender.username%></h1>
+        &
+      <h1 id="receiverName" aria-valuetext="<%=receiver.username%>"><%=receiver.username%></h1>
+      <h2 id="room" aria-valuetext="<%=conversation._id%>">Room id: <%=conversation._id%></h2>
+      <input type="text" id="message">
+      <button type="button" name="button" onclick="sendMessage()" >Send</button>
+      <div id="message-container">
+        <% for (const conv of conversation.messages) {%>
+            <div>
+                <b><%if (conv.sender.toString() == sender._id.toString()) {%> 
+                        <%=sender.username%>
+                    <%} else {%>
+                        <%=receiver.username%>
+                    <%}%>
+                </b>: 
+                <%=conv.message%>
+            </div>
+        <%}%>
+        
+      </div>
+</body>
+</html>
