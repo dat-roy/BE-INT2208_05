@@ -12,5 +12,7 @@ router.post('/my-posts', checkSession, postController.getMyPosts);
 //router.get('/edit/:id', checkSession, postController.editPost);
 router.post('/soft-delete/:id', checkSession, postController.softDeletePost);
 router.post('/hard-delete/:id', checkSession, postController.hardDeletePost);
+router.post('/save/:id', checkSession, postController.savePost);
+router.post('/unsave/:id', checkSession, postController.unsavePost);
 
 module.exports = router;

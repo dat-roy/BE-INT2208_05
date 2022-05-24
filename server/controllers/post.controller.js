@@ -24,9 +24,9 @@ class postController {
         if (room_type) {
             filter_map.set('information.room_type', room_type);
         }
-        if (gender) {
-            filter_map.set('information.gender', gender);
-        }
+        // if (gender) {
+        //     filter_map.set('information.gender', gender);
+        // }
         if (min_room_area && max_room_area) {
             filter_map.set('information.room_area', 
                 { $gte: min_room_area, $lte: max_room_area }
@@ -131,24 +131,25 @@ class postController {
     // [POST] /post/new
     createNewPost(req, res, next) {
         const {                    
-            room_type, 
-            capacity, 
-            gender, 
+            //room_type, 
+            //capacity, 
+            //gender, 
             room_area, 
             rental_price,
-            deposit,
-            electricity_cost,
-            water_cost,
-            internet_cost,
-            has_parking_space,
-            parking_cost,
-            city,
-            district,
-            ward, 
-            street,
-            house_number,
+            //deposit,
+            //electricity_cost,
+            //water_cost,
+            //internet_cost,
+            //has_parking_space,
+            //parking_cost,
+            address,
+            //city,
+            //district,
+            //ward, 
+            //street,
+            //house_number,
             filename_list,
-            utils_list,
+            //utils_list,
             phone_number,
             title_of_post,
             room_description, 
@@ -156,30 +157,31 @@ class postController {
         const postRecord = new PostModel({
             author: req.user._id,
             information: {
-                room_type: room_type,
-                capacity: capacity,
-                gender: gender,
+                //room_type: room_type,
+                //capacity: capacity,
+                //gender: gender,
                 room_area: room_area,
                 expenses: {
                     rental_price: rental_price,
-                    deposit: deposit,
-                    electricity_cost: electricity_cost,
-                    water_cost: water_cost,
-                    internet_cost: internet_cost,
+                    //deposit: deposit,
+                    //electricity_cost: electricity_cost,
+                    //water_cost: water_cost,
+                    //internet_cost: internet_cost,
                 },
-                has_parking_space: has_parking_space, 
-                parking_cost: parking_cost,
+                //has_parking_space: has_parking_space, 
+                //parking_cost: parking_cost,
             },
             address: {
-                city: city,
-                district: district,
-                ward: ward,
-                street: street,
-                house_number: house_number,
+                //city: city,
+                //district: district,
+                //ward: ward,
+                //street: street,
+                //house_number: house_number,
+                address: address,
             },
             utilities: {
                 images: filename_list,
-                utils: utils_list,
+                //utils: utils_list,
             },
             confirmation: {
                 phone_number: phone_number,
@@ -292,6 +294,69 @@ class postController {
                 })
             }
         })
+    }
+
+    // [POST] /post/save/:id
+    async savePost(req, res, next) {
+        const user_id = req.user._id;
+        const post_id = req.params.id;
+        console.log(post_id);
+
+        const post = await PostModel.findById(post_id);
+        if (! post) {
+            return res.status(404).json({
+                message: "Post not found",
+                err: null,
+            })
+        } else {
+            const user = await UserModel.findByIdAndUpdate(user_id, {
+                $push: {
+                    saved_posts: post_id,
+                }
+            })
+            if (! user) {
+                return res.status(404).json({
+                    message: "Invalid user",
+                    err: null,
+                })
+            } else {
+                return res.status(200).json({
+                    message: "Save a favorite post successfully",
+                    err: null,
+                })
+            }
+        }
+    }
+
+    // [POST] /post/unsave/:id
+    async unsavePost(req, res, next) {
+        const user_id = req.user._id;
+        const post_id = req.params.id;
+
+        const post = await PostModel.findById(post_id);
+        if (! post) {
+            return res.status(404).json({
+                message: "Post not found",
+                err: null,
+            })
+        } else {
+            const user = await UserModel.findByIdAndUpdate(user_id, {
+                $pull: {
+                    saved_posts: post_id,
+                }
+            })
+            if (! user) {
+                return res.status(404).json({
+                    message: "Invalid user",
+                    err: null,
+                })
+            } else {
+                return res.status(200).json({
+                    message: "Unsave a favorite post successfully",
+                    err: null,
+                })
+            }
+        }
     }
 }
 
