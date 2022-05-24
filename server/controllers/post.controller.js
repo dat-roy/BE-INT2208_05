@@ -199,11 +199,11 @@ class postController {
                 //house_number: house_number,
             },
             utilities: {
-                //images: [filename_list],
-                utils: [utils_list],
+                images: [filename_list],
+                //utils: [utils_list],
             },
             confirmation: {
-                phone_number: phone_number,
+                //phone_number: phone_number,
                 title_of_post: title_of_post,
                 room_description: room_description,
             },

@@ -79,7 +79,7 @@ class userController {
                 userRecord.save()
                     .then((user) => {
                         let token = jwt.sign({ email: email }, JWTPrivateKey, { expiresIn: '3h' });
-                        res.cookie('session-token', token);
+                        //res.cookie('session-token', token);
                         if (!user.picture.image_url) {
                             user.picture.name = `/upload/avatar/${user.picture.name}`;
                         }
