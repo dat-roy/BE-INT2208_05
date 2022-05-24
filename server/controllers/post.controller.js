@@ -186,6 +186,7 @@ class postController {
         const file_list = req.files;
         console.log(file_list);
         //res.status(200).send(file_list);
+        console.log(req);
         res.status(200).send(req);
         /*const postRecord = new PostModel({
             author: req.user._id,
