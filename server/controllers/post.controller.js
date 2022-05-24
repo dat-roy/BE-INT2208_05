@@ -50,6 +50,14 @@ class postController {
             filter_map.set('information.expenses.rental_price', 
                 { $gte: min_price, $lte: max_price }
             );
+        } else if (min_price) {
+            filter_map.set('information.expenses.rental_price', 
+                { $gte: min_price }
+            );
+        } else if (max_price) {
+            filter_map.set('information.expenses.rental_price', 
+                { $lte: max_price }
+            );
         }
         
         const filter = Object.fromEntries(filter_map);
@@ -189,8 +197,8 @@ class postController {
                 house_number: house_number,
             },
             utilities: {
-                images: filename_list,
-                utils: utils_list,
+                //images: [filename_list],
+                utils: [utils_list],
             },
             confirmation: {
                 phone_number: phone_number,
@@ -242,9 +250,27 @@ class postController {
             })
     }
 
+    //TODO: add findByIdAndUpdate
+    // [GET] /post/edit/:id
+    async editPost(req, res, next) {
+        const post_id = req.params.id;
+        const post = await PostModel.findById(post_id);
+        if (! post) {
+            return res.status(404).json({
+                message: "Invalid post id",
+            })
+        } 
+        if (post.author != user._id) {
+            return res.status(403).json({
+                message: "Access is denied",
+            })
+        } 
+        //PostModel.findByIdAndUpdate(post.author, {})
+    }
 
     // [GET] /post/soft-delete/:id
     async softDeletePost(req, res, next) {
+        const user_id = req.user._id;
         const post_id = req.params.id;
         const post = await PostModel.findById(post_id);
         if (! post) {
@@ -253,13 +279,14 @@ class postController {
                 error: null,
             })
         } 
-        if (post.author != user._id) {
+        console.log(user_id);
+        if (! post.author.equals(user_id)) {
             return res.status(403).json({
                 message: "Access is denied",
                 error: null,
             })
         } 
-        PostModel.findByIdAndUpdate(post.author, {soft_delete: true}, (err, docs) => {
+        PostModel.findByIdAndUpdate(post_id, {soft_delete: true}, (err, docs) => {
             if (err) {
                 res.status(500).json({
                     message: "Error when soft delete a post",
@@ -276,6 +303,7 @@ class postController {
 
     // [GET] /post/hard-delete/:id
     async hardDeletePost(req, res, next) {
+        const user_id = req.user._id;
         const post_id = req.params.id;
         const post = await PostModel.findById(post_id);
         if (! post) {
@@ -284,13 +312,13 @@ class postController {
                 error: null,
             })
         } 
-        if (post.author != user._id) {
+        if (! post.author.equals(user_id)) {
             return res.status(403).json({
                 message: "Access is denied",
                 error: null,
             })
         } 
-        PostModel.findByIdAndDelete(post.author, (err, docs) => {
+        PostModel.findByIdAndDelete(post_id, (err, docs) => {
             if (err) {
                 res.status(500).json({
                     message: "Error when hard delete a post",
