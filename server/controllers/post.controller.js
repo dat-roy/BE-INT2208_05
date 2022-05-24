@@ -30,13 +30,6 @@ class postController {
         const { room_type, gender, min_room_area, max_room_area, capacity, min_price, max_price } = req.body;
 
         let filter_map = new Map();
-        // if (room_type) {
-        //     filter_map.set('information.room_type', room_type);
-        // }
-        // if (gender) {
-        //     filter_map.set('information.gender', gender);
-        // }
-        console.log(min_room_area && max_room_area);
         if (min_room_area && max_room_area) {
             filter_map.set('information.room_area', 
                 { $gte: min_room_area, $lte: max_room_area }
@@ -70,7 +63,6 @@ class postController {
         }
         
         const filter = Object.fromEntries(filter_map);
-        //console.log(filter);
         
         PostModel.find(filter)
             .then(posts => {
@@ -159,32 +151,15 @@ class postController {
     // [POST] /post/new
     createNewPost(req, res, next) {
         const {                    
-            //room_type, 
-            //capacity, 
-            //gender, 
             room_area, 
             rental_price,
-            //deposit,
-            //electricity_cost,
-            //water_cost,
-            //internet_cost,
-            //has_parking_space,
-            //parking_cost,
-            //city,
-            //district,
             address,
-            //ward, 
-            //street,
-            //house_number,
-            //filename_list,
-            //utils_list,
-            //phone_number,
             title_of_post,
             room_description, 
         } = req.body;
 
         const file_list = req.files;
-        console.log(file_list);
+        //console.log(file_list);
         //res.status(200).send(file_list);
         console.log(req);
         res.status(200).send(req);
@@ -267,23 +242,6 @@ class postController {
             })
     }
 
-    //TODO: add findByIdAndUpdate
-    // [GET] /post/edit/:id
-    async editPost(req, res, next) {
-        const post_id = req.params.id;
-        const post = await PostModel.findById(post_id);
-        if (! post) {
-            return res.status(404).json({
-                message: "Invalid post id",
-            })
-        } 
-        if (post.author != user._id) {
-            return res.status(403).json({
-                message: "Access is denied",
-            })
-        } 
-        //PostModel.findByIdAndUpdate(post.author, {})
-    }
 
     // [GET] /post/soft-delete/:id
     async softDeletePost(req, res, next) {

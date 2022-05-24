@@ -8,7 +8,6 @@ const GenderOptions = Object.freeze({
     MALE: 'male',
     FEMALE: 'female',
     OTHER: 'other',
-    ALL: 'all',
 });
 
 const ColorOptions = Object.freeze({
@@ -23,17 +22,6 @@ const PostStatus = Object.freeze({
     APPROVED: 1,
 });
 
-const RoomTypes = Object.freeze({
-    DORMITORY: 'dormitory',
-    HOUSE: 'house',
-    APARTMENT: 'apartment',
-    ROOM_FOR_RENT: 'room_for_rent',
-    ROOM_FOR_SHARE: 'room_for_share',
-});
-
-const UtilitiesOptions = Object.freeze({
-
-});
 
 const AccountStatus = Object.freeze({
     NEW_ACCOUNT: 'NEW_ACCOUNT',
@@ -45,7 +33,5 @@ module.exports = {
     GenderOptions,
     ColorOptions,
     PostStatus,
-    RoomTypes,
-    UtilitiesOptions,
     AccountStatus,
 }

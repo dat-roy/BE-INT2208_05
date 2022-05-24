@@ -4,20 +4,11 @@ const slug = require('mongoose-slug-generator');
 mongoose.plugin(slug);
 const { Schema } = mongoose;
 
-const InfoSchema = new Schema({
-    //room_type: {type: String, default: ''},
-    //capacity: {type: Number, default: 1},
-    //gender: {type: String, default: GenderOptions.ALL}, 
+const InfoSchema = new Schema({ 
     room_area: {type: Number, default: null},
     expenses: {
         rental_price: {type: Number}, 
-        //deposit: {type: Number},
-        //electricity_cost: {type: Number},
-        //water_cost: {type: Number},
-        //internet_cost: {type: Number},
     },
-    //has_parking_space: {type: String}, 
-    //parking_cost: {type: String},
 })
 
 const AddressSchema = new Schema({
@@ -32,7 +23,6 @@ const AddressSchema = new Schema({
 
 const UtilSchema = new Schema({
     images: [{type: String, default: null}],
-    //utils: [{type: String, default: null}],
 })
 
 const ConfirmSchema = new Schema({
