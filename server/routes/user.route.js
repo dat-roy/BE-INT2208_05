@@ -8,6 +8,8 @@ const saved_image_folder = 'avatar';
 const upload_image_field = 'file';
 
 //=========================//
+//TODO: remove in last version
+router.get('/login', userController.login);
 
 //Server
 router.post('/auth/google-login', userController.verifyGoogleLogin);
