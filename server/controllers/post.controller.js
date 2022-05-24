@@ -167,13 +167,15 @@ class postController {
             //ward, 
             //street,
             //house_number,
-            filename_list,
+            //filename_list,
             //utils_list,
             //phone_number,
             title_of_post,
             room_description, 
         } = req.body;
-        console.log(filename_list);
+
+        const file_list = req.files;
+        console.log(file_list);
         /*const postRecord = new PostModel({
             author: req.user._id,
             information: {
