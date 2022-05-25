@@ -43,73 +43,12 @@ class siteController {
 
     // [POST] /search-by-text
     searchByText(req, res) {
-        const text = req.body.text;
-        PostModel.find({
-            $text: { $search: text },
-        }) 
-            .then(posts => {
-                if (! posts) {
-                    return res.status(404).json({
-                        message: "No post found",
-                        posts: null, 
-                        error: null,
-                    })
-                } else {
-                    return res.status(200).json({
-                        message: "Find posts successfully",
-                        posts: posts,
-                        error: null,
-                    })
-                }
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    message: "Error from server",
-                    posts: posts,
-                    error: err.message,
-                })
-            })
-    }   
-
-    // [POST] /search-in-user
-    searchUser(req, res) {
-        const text = req.body.content;       //Search content
-        UserModel.find({
-            $or: [
-                {username: text},
-                {email: text},
-                {phone: text},
-            ]
-        })
-            .then(users => {
-                if (! users) {
-                    return res.status(404).json({
-                        message: "No user found",
-                        users: users,
-                        error: null,
-                    })
-                } else {
-                    return res.status(200).json({
-                        message: "Find users successfully",
-                        users: users,
-                        error: null,
-                    })
-                }
-            })
-            .catch(err => {
-                return res.status(500).json({
-                    message: "Error from server",
-                    users: null,
-                    error: err.message,
-                })
-            })
-    }
-
-    // [POST] /search-in-post       
-    searchPost(req, res) {
+        const text = req.body.text || '';
         const address = req.body.address;                       
         const price_category = req.body.price_category;          //Data got from options
-        
+
+
+        //Filter for searching posts
         let filter_map = new Map();
         if (address) {
             filter_map.set('address.address', address);
@@ -139,30 +78,110 @@ class siteController {
 
         const filter = Object.fromEntries(filter_map);
 
-        PostModel.find(filter)
-            .then(posts => {
-                if (! posts) {
+        Promise.all(
+            [
+                PostModel.find(
+                    { $text: {$search: text} },
+                    filter
+                ),
+                UserModel.find({
+                    $or: [
+                        {username: text},
+                        {email: text},
+                        {phone: text},
+                    ]
+                })
+            ]
+        )
+            .then(result => {
+                //console.log(posts);
+                //console.log(users);
+                const posts = result[0];
+                const users = result[1];
+                if (!posts && !users) {
                     return res.status(404).json({
-                        message: "No post found",
+                        message: "No result",
                         posts: null,
-                        error: null
-                    })
-                } else {
-                    return res.status(200).json({
-                        message: "Search posts successfully",
-                        posts: posts,
+                        users: null,
                         error: null,
                     })
                 }
+                return res.status(200).json({
+                    message: "Get searching results successfully",
+                    posts: posts,
+                    users: users,
+                    error: null,
+                })
             })
             .catch(err => {
                 return res.status(500).json({
                     message: "Error from server",
                     posts: null,
+                    users: null,
                     error: err.message,
                 })
             })
-    }
+    }   
+
+
+    // [POST] /search-in-post       
+    // searchPost(req, res) {
+    //     const address = req.body.address;                       
+    //     const price_category = req.body.price_category;          //Data got from options
+        
+    //     let filter_map = new Map();
+    //     if (address) {
+    //         filter_map.set('address.address', address);
+    //     }
+    //     if (price_category) {
+    //         switch (price_category) 
+    //         {
+    //             case PriceCategory.LOWER_2M: 
+    //                 filter_map.set('information.expenses.rental_price', 
+    //                     { $gte: 0, $lte: 2000000 }
+    //                 );
+    //             break;
+
+    //             case PriceCategory.FROM_2M_TO_4M:
+    //                 filter_map.set('information.expenses.rental_price', 
+    //                     { $gte: 2000000, $lte: 4000000 }
+    //                 );
+    //             break;
+
+    //             case PriceCategory.HIGHER_4M:
+    //                 filter_map.set('information.expenses.rental_price', 
+    //                     { $gte: 4000000, }
+    //                 );
+    //             break;
+    //         }
+    //     }
+
+    //     const filter = Object.fromEntries(filter_map);
+
+    //     PostModel.find(filter)
+    //         .then(posts => {
+    //             if (! posts) {
+    //                 return res.status(404).json({
+    //                     message: "No post found",
+    //                     posts: null,
+    //                     error: null
+    //                 })
+    //             } else {
+    //                 return res.status(200).json({
+    //                     message: "Search posts successfully",
+    //                     posts: posts,
+    //                     error: null,
+    //                 })
+    //             }
+    //         })
+    //         .catch(err => {
+    //             return res.status(500).json({
+    //                 message: "Error from server",
+    //                 posts: null,
+    //                 error: err.message,
+    //             })
+    //         })
+    // }
 }
 
 module.exports = new siteController();
