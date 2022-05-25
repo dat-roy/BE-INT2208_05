@@ -5,8 +5,8 @@ const path = require('path');
 
 router.get('/', siteController.home);
 router.get('/share/qr', siteController.shareByQR);
-router.get('/client.js', (req, res) => {
-    res.sendFile(path.resolve('server/client.js') );
-})
+router.post('/search-by-text', siteController.searchByText);
+router.post('/search-in-user', siteController.searchUser);
+router.post('/search-in-post', siteController.searchPost);
 
 module.exports = router;

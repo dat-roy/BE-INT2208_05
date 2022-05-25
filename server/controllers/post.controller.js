@@ -18,16 +18,13 @@ class postController {
         /*Request form data: 
         /// NOTE: undefined here means 'accepting all options'.
         {
-            room_type: String {undefined by default, ... }
-            gender: String, {'all' by default, 'male', 'female'}
             min_room_area: Number, {undefined by default, ...}
             max_room_area: Number, {undefined by default, ...}
-            capacity: Number, {1 by default, 2, 3, ...}
             min_price: Number, {undefined by default}
             max_price: Number, {undefined by default}
         }
         */
-        const { room_type, gender, min_room_area, max_room_area, capacity, min_price, max_price } = req.body;
+        const { min_room_area, max_room_area, min_price, max_price } = req.body;
 
         let filter_map = new Map();
         if (min_room_area && max_room_area) {
@@ -45,9 +42,7 @@ class postController {
             { $lte: max_room_area }
             )
         }
-        if (capacity) {
-            filter_map.set('information.capacity', capacity);
-        }
+        
         if (min_price && max_price) {
             filter_map.set('information.expenses.rental_price', 
                 { $gte: min_price, $lte: max_price }

@@ -22,11 +22,16 @@ const PostStatus = Object.freeze({
     APPROVED: 1,
 });
 
-
 const AccountStatus = Object.freeze({
     NEW_ACCOUNT: 'NEW_ACCOUNT',
     EXISTENT_ACCOUNT: 'EXISTENT_ACCOUNT',
 });
+
+const PriceCategory = Object.freeze({
+    LOWER_2M: 0,
+    FROM_2M_TO_4M: 1,
+    HIGHER_4M: 2,
+})
 
 module.exports = {
     RoleOptions, 
@@ -34,4 +39,5 @@ module.exports = {
     ColorOptions,
     PostStatus,
     AccountStatus,
+    PriceCategory,
 }
