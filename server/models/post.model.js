@@ -46,6 +46,13 @@ const PostSchema = new Schema(
     },
 )
 
+PostSchema.index({
+    "address.address": "text",
+    "title_of_post": "text",
+    "room_description": "text",
+    //phone_number: "text",
+
+})
 // Export a model
 // Modal name = Collection name (in plural & lowercase form)
 module.exports = mongoose.model('post', PostSchema);
